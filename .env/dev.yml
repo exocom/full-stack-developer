@@ -1,3 +1,7 @@
 ---
-  provider: 
-    environment: 
+provider:
+  environment:
+    TOPPING_COLLECTION: "toppings"
+#    TOPPINGS_S3_BUCKET: "full-stack-developer-toppings"
+
+    MONGO_URI: "mongodb+srv://demo:demo@cluster0-rxatp.mongodb.net/pizza?retryWrites=true"
