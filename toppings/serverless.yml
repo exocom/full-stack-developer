@@ -43,6 +43,12 @@ functions:
       - ${self:custom.layers.node-modules}
     events:
       - http: GET toppings
+  deleteTopping:
+    handler: src/handler.deleteTopping
+    layers:
+      - ${self:custom.layers.node-modules}
+    events:
+      - http: DELETE toppings/{toppingId}
 
 resources:  # CloudFormation template syntax
   Resources:

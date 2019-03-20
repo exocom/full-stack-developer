@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import {deserialize, plainToClass} from 'class-transformer';
 import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
-import {CreateToppingRequest, dataUrlRegExp, ImageDataUrl} from './models/request';
+import {CreateToppingBody, dataUrlRegExp, DeleteToppingPathParameters} from './models/request';
 import {MongoClient} from 'mongodb';
 import {S3} from 'aws-sdk';
 import {MongoTopping} from './models/mongo-topping';
@@ -25,7 +25,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
-  const body = deserialize(CreateToppingRequest, event.body);
+  const body = deserialize(CreateToppingBody, event.body);
   const bodyErrors = await validate(body) || [];
   if (bodyErrors.length) {
     const validation = [...bodyErrors];
@@ -74,11 +74,20 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
 };
 
-
 export const getToppings: ApiGatewayHandler = async () => {
   const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const results = await toppingCollection.find({}).toArray();
   return apiGatewayUtil.sendJson({body: {data: results.map(mapMongoToppingToTopping)}});
+};
+
+export const deleteTopping: ApiGatewayHandler = async (event) => {
+  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const toppingCollection = client.db().collection(TOPPING_COLLECTION);
+
+  const {toppingId} = plainToClass(DeleteToppingPathParameters, event.pathParameters);
+  const {deletedCount} = await toppingCollection.deleteOne({_id: toppingId});
+
+  return apiGatewayUtil.sendJson({statusCode: deletedCount === 0 ? 404 : 204});
 };

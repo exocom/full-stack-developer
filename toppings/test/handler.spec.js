@@ -13,7 +13,7 @@ const serverlessLocalServer = new StandaloneLocalDevServer({
 });
 
 const signedUrlRegExp = ({bucket, key}) => {
-  return new RegExp(`^https:\\/\\/${bucket}\.s3\.amazonaws\.com/${key}`)
+  return new RegExp(`^https:\\/\\/${bucket}\.s3(\.us-west-2)?\.amazonaws\.com/${key}`)
 };
 
 const {dataUrlRegExp} = require('../src/models/request');
@@ -37,6 +37,8 @@ describe('toppings', () => {
     ]
   };
 
+  let handler;
+
   before(async () => {
     const mongoUri = await mongoUnit.start();
     await serverlessLocalServer.loadServerlessYaml();
@@ -45,6 +47,7 @@ describe('toppings', () => {
       ...serverlessLocalServer.slsYaml.provider.environment,
       MONGO_URI: mongoUri,
     };
+    handler = require('../src/handler');
   });
 
   beforeEach(async () => {
@@ -72,7 +75,7 @@ describe('toppings', () => {
     };
 
     it('should return a new topping', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 201);
       assert.isString(body);
@@ -95,7 +98,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -123,7 +126,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -151,7 +154,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -179,7 +182,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -208,7 +211,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -235,7 +238,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -261,7 +264,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -292,7 +295,7 @@ describe('toppings', () => {
     };
 
     it('should return validation errors', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 400);
       assert.isString(body);
@@ -324,7 +327,7 @@ describe('toppings', () => {
     };
 
     it('should return a new topping', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 401);
       assert.isString(body);
@@ -352,13 +355,51 @@ describe('toppings', () => {
     });
 
     it('should return a server error', async () => {
-      const {createTopping} = require('../src/handler');
+      const {createTopping} = handler;
       const {body} = await createTopping({body: JSON.stringify(requestBody)});
       assert.isString(body);
 
       const {error} = JSON.parse(body);
       assert.equal(error.type, 'Upload Failure');
       assert.equal(error.message, 'Unable to save the image.');
+    });
+  });
+
+  describe('get toppings', () => {
+    it('should return all toppings', async () => {
+      const {getToppings} = handler;
+      const {body, statusCode} = await getToppings();
+      assert.equal(statusCode, 200);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.isArray(data);
+
+      const [topping] = data;
+      assert.isDefined(topping.name);
+      assert.isDefined(topping.type);
+      assert.isDefined(topping.image.url);
+    });
+  });
+
+
+  describe('delete topping', () => {
+    it('should return nothing', async () => {
+      const toppingId = testData.toppings[0]._id.toString();
+      const {deleteTopping} = handler;
+      const {body, statusCode} = await deleteTopping({pathParameters: {toppingId}});
+      assert.equal(statusCode, 204);
+      assert.isEmpty(body);
+    });
+  });
+
+  describe('delete topping that doesn\'t exist', () => {
+    it('should return nothing', async () => {
+      const toppingId = ObjectId().toString();
+      const {deleteTopping} = handler;
+      const {body, statusCode} = await deleteTopping({pathParameters: {toppingId}});
+      assert.equal(statusCode, 404);
+      assert.isEmpty(body);
     });
   });
 });

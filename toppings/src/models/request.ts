@@ -1,6 +1,7 @@
 import {IsDefined, IsEnum, Matches, MaxLength, MinLength, ValidateNested} from 'class-validator';
-import {Type} from 'class-transformer';
+import {Transform, Type} from 'class-transformer';
 import {ToppingType} from './toppings';
+import {ObjectId} from 'mongodb';
 
 export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;
 
@@ -10,7 +11,7 @@ export class ImageDataUrl {
   dataUrl: string;
 }
 
-export class CreateToppingRequest {
+export class CreateToppingBody {
   @IsDefined()
   @MinLength(3)
   @MaxLength(35)
@@ -29,4 +30,9 @@ export class CreateToppingRequest {
   @ValidateNested()
   @Type(() => ImageDataUrl)
   image: ImageDataUrl;
+}
+
+export class DeleteToppingPathParameters {
+  @Transform(value => ObjectId(value), {toClassOnly: true})
+  toppingId: ObjectId;
 }
