@@ -79,6 +79,7 @@ describe('toppings', () => {
 
       const {data} = JSON.parse(body);
       assert.equal(data.name, requestBody.name);
+      assert.equal(data.type, requestBody.type);
       assert.match(data.image.url, signedUrlRegExp({
         bucket: process.env.TOPPINGS_S3_BUCKET,
         key: `${name}\.${imageExt}`

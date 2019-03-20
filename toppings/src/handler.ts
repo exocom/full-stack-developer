@@ -12,11 +12,12 @@ const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
 
 
-const mapMongoToppingToTopping = ({_id, image, name}: MongoTopping) => {
+const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping) => {
   return {
     id: _id,
-    image: {url: s3.getSignedUrl('getObject', {Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key})},
-    name
+    name,
+    type,
+    image: {url: s3.getSignedUrl('getObject', {Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key})}
   };
 };
 
@@ -36,7 +37,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
 
-  const {name, image} = body;
+  const {name, type, image} = body;
   const existingTopping = await toppingCollection.findOne({name});
   if (existingTopping) {
     const error = {
@@ -65,6 +66,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 
   const results = await toppingCollection.insertOne({
     name,
+    type,
     image: {s3key: `${name}.${ext}`}
   });
   const [mongoTopping] = results.ops;
