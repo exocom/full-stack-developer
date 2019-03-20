@@ -1,7 +1,11 @@
-import {IsDefined, IsNotEmpty, MaxLength, MinLength, ValidateNested} from 'class-validator';
+import {IsDefined, Matches, MaxLength, MinLength, ValidateNested} from 'class-validator';
+import {Type} from 'class-transformer';
 
-class ImageDataUrl {
-  @IsNotEmpty()
+export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;
+
+export class ImageDataUrl {
+  @IsDefined()
+  @Matches(dataUrlRegExp)
   dataUrl: string;
 }
 
@@ -11,6 +15,8 @@ export class CreateToppingRequest {
   @MaxLength(35)
   name: string;
 
+  @IsDefined()
   @ValidateNested()
+  @Type(() => ImageDataUrl)
   image: ImageDataUrl;
 }

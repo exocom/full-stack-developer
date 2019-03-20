@@ -45,6 +45,7 @@ describe('toppings', () => {
     await mongoUnit.initDb(process.env.MONGO_URI, testData);
     awsMock.mock('S3', 'putObject', {ETag: '4166c51556fff0f1354b2f5704b1c297'});
   });
+
   afterEach(async () => {
     await mongoUnit.drop();
     awsMock.restore('S3');
@@ -55,7 +56,7 @@ describe('toppings', () => {
     const name = 'pepperoni';
     const requestBody = {
       name,
-      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
     it('should return a new topping', async () => {
@@ -75,7 +76,7 @@ describe('toppings', () => {
   describe('create a topping with missing name', () => {
     const imageExt = 'png';
     const requestBody = {
-      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
     it('should return validation errors', async () => {
@@ -102,7 +103,7 @@ describe('toppings', () => {
     const name = 'ta';
     const requestBody = {
       name,
-      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
     it('should return validation errors', async () => {
@@ -129,7 +130,7 @@ describe('toppings', () => {
     const name = 'pepppppppppppppoooorrrrrnnnniiiiiiii';
     const requestBody = {
       name,
-      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
     it('should return validation errors', async () => {
@@ -151,19 +152,87 @@ describe('toppings', () => {
     });
   });
 
-  /*
   describe('create a topping with missing image', () => {
+    const name = 'pepperoni';
+    const requestBody = {
+      name
+    };
+
     it('should return validation errors', async () => {
-      return true;
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [imageError] = error.validation;
+      const prop = 'image';
+      assert.equal(imageError.property, prop);
+      assert.equal(imageError.constraints.isDefined, `${prop} should not be null or undefined`);
+    });
+  });
+
+  describe('create a topping with image that has no dataUrl', () => {
+    const name = 'pepperoni';
+    const requestBody = {
+      name,
+      image: {}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [imageError] = error.validation;
+      assert.isArray(imageError.children);
+
+      const [imageDataError] = imageError.children;
+      const prop = 'dataUrl';
+      assert.equal(imageDataError.property, prop);
+      assert.equal(imageDataError.constraints.isDefined, `${prop} should not be null or undefined`);
+      assert.isUndefined(imageDataError.constraints.matches);
     });
   });
 
   describe('create a topping with invalid image dataUrl', () => {
-    it('should return validation errors with a info about dataUrl format', async () => {
-      return true;
+    const name = 'pepperoni';
+    const requestBody = {
+      name,
+      image: {dataUrl: 'foo'}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [imageError] = error.validation;
+      assert.isArray(imageError.children);
+
+      const [imageDataError] = imageError.children;
+      const prop = 'dataUrl';
+      const {dataUrlRegExp} = require('../src/models/request');
+      assert.equal(imageDataError.property, prop);
+      assert.isUndefined(imageDataError.constraints.isDefined);
+      assert.equal(imageDataError.constraints.matches, `${prop} must match ${dataUrlRegExp} regular expression`);
     });
   });
 
+  /*
   describe('create a topping with the same name as an existing topping', () => {
     it('should return a validation error', async () => {
       return true;

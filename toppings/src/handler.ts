@@ -1,7 +1,8 @@
+import 'reflect-metadata';
 import {deserialize, plainToClass} from 'class-transformer';
 import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
-import {CreateToppingRequest} from './models/request';
+import {CreateToppingRequest, dataUrlRegExp, ImageDataUrl} from './models/request';
 import {MongoClient} from 'mongodb';
 import {S3} from 'aws-sdk';
 import {MongoTopping} from './models/mongo-topping';
@@ -45,16 +46,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
   }
 
-  const matches = image.dataUrl.match(/^data:(.*?\/(.*?));(.*$)/);
-  if (!(matches && matches.length === 4)) {
-    const error = {
-      type: 'Validation',
-      message: 'Failed validation',
-      validation: ['Invalid data url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs']
-    };
-    return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
-  }
-
+  const matches = image.dataUrl.match(dataUrlRegExp);
   const [dataUrl, contentType, ext, base64data] = matches;
   const result = await s3.putObject({
     Bucket: TOPPINGS_S3_BUCKET,
