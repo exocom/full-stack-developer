@@ -17,6 +17,7 @@ const signedUrlRegExp = ({bucket, key}) => {
 };
 
 const {dataUrlRegExp} = require('../src/models/request');
+const {ToppingType} = require('../src/models/toppings');
 
 describe('toppings', () => {
   const testData = {
@@ -24,11 +25,13 @@ describe('toppings', () => {
       {
         _id: ObjectId('5c919a1b4678ee70a617858e'),
         name: 'sausage',
+        type: 'meat',
         image: {s3key: 'sausage.gif'}
       },
       {
         _id: ObjectId('5c91990bd24291707e38a906'),
         name: 'pineapple',
+        type: 'fruit',
         image: {s3key: 'pineapple.gif'}
       }
     ]
@@ -64,6 +67,7 @@ describe('toppings', () => {
     const name = 'pepperoni';
     const requestBody = {
       name,
+      type: ToppingType.Meat,
       image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
@@ -85,6 +89,7 @@ describe('toppings', () => {
   describe('create a topping with missing name', () => {
     const imageExt = 'png';
     const requestBody = {
+      type: ToppingType.Seasoning,
       image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
@@ -108,11 +113,67 @@ describe('toppings', () => {
     });
   });
 
+  describe('create a topping with missing type', () => {
+    const imageExt = 'png';
+    const name = 'pepperoni';
+    const requestBody = {
+      name,
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [toppingTypeError] = error.validation;
+      const prop = 'type';
+      const values = Object.values(ToppingType).join(', ');
+      assert.equal(toppingTypeError.property, prop);
+      assert.equal(toppingTypeError.constraints.isEnum, `${prop} must be a valid enum value: ${values}`);
+    });
+  });
+
+  describe('create a topping with invalid type', () => {
+    const imageExt = 'png';
+    const name = 'pepperoni';
+    const requestBody = {
+      name,
+      type: 'garlic',
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [toppingTypeError] = error.validation;
+      const prop = 'type';
+      const values = Object.values(ToppingType).join(', ');
+      assert.equal(toppingTypeError.property, prop);
+      assert.equal(toppingTypeError.constraints.isEnum, `${prop} must be a valid enum value: ${values}`);
+    });
+  });
+
   describe('create a topping with name that is too short', () => {
     const imageExt = 'png';
     const name = 'ta';
     const requestBody = {
       name,
+      type: ToppingType.Seasoning,
       image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
@@ -141,6 +202,7 @@ describe('toppings', () => {
     const name = 'pepppppppppppppoooorrrrrnnnniiiiiiii';
     const requestBody = {
       name,
+      type: ToppingType.Meat,
       image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
@@ -167,7 +229,8 @@ describe('toppings', () => {
   describe('create a topping with missing image', () => {
     const name = 'pepperoni';
     const requestBody = {
-      name
+      name,
+      type: ToppingType.Meat,
     };
 
     it('should return validation errors', async () => {
@@ -192,6 +255,7 @@ describe('toppings', () => {
     const name = 'pepperoni';
     const requestBody = {
       name,
+      type: ToppingType.Meat,
       image: {}
     };
 
@@ -222,6 +286,7 @@ describe('toppings', () => {
     const name = 'pepperoni';
     const requestBody = {
       name,
+      type: ToppingType.Meat,
       image: {dataUrl: 'foo'}
     };
 
@@ -253,6 +318,7 @@ describe('toppings', () => {
     const name = 'sausage';
     const requestBody = {
       name,
+      type: ToppingType.Meat,
       image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
     };
 
