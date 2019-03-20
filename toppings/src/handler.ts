@@ -46,11 +46,11 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   }
 
   const matches = image.dataUrl.match(/^data:(.*?\/(.*?));(.*$)/);
-  if (!matches) {
+  if (!(matches && matches.length === 4)) {
     const error = {
       type: 'Validation',
       message: 'Failed validation',
-      validation: ['Invalid image type.']
+      validation: ['Invalid data url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs']
     };
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
@@ -60,7 +60,6 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     Bucket: TOPPINGS_S3_BUCKET,
     Key: `${name}.${ext}`,
     ContentType: contentType,
-    ACL: 'public-read',
     Body: Buffer.from(base64data, 'base64')
   }).promise();
 
