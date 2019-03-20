@@ -1,0 +1,15 @@
+service:
+  name: full-stack-developer-node-modules-layer
+
+provider:
+  name: aws
+  profile: ${file(../../serverless.yml):provider.profile}
+  region: ${file(../../serverless.yml):provider.region}
+  stage: ${file(../../serverless.yml):provider.stage}
+
+layers:
+  node_modules:
+    name: node-modules-${self:provider.stage}
+    path: src
+    compatibleRuntimes:
+      - nodejs8.10

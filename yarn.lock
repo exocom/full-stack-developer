@@ -7,11 +7,6 @@
   resolved "https://registry.yarnpkg.com/@kalarrs/aws-util/-/aws-util-1.1.5.tgz#3d6a1b769d2adfc9a10bed60aad747ea4e836b85"
   integrity sha512-JY3Li7ZkxQmS4ohZTM9Bt+eOUFeHk2msIp5N1GD9ZIgiSLthF9cGxdvCywRbKoYBzlTlt3DE2X+iOgGqmx0VFQ==
 
-"@kalarrs/mongoose-util@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@kalarrs/mongoose-util/-/mongoose-util-1.0.0.tgz#2c543b9dd870c21d099b4e7c0b2583eb12898ba7"
-  integrity sha512-uiJHsrguT0mW+JMd5Xosv9BjXhhDsGO5KZoIMkOdKwuqxq8s5DDd1mocdhnMSaW5YPiEiR+OEyz+84hNKtc4nQ==
-
 "@kalarrs/serverless-domain-manager@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@kalarrs/serverless-domain-manager/-/serverless-domain-manager-2.4.0.tgz#b20b3fdf85afabbf5f1f5301695406236e799de6"
@@ -674,11 +669,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bcrypt-nodejs@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/bcrypt-nodejs/-/bcrypt-nodejs-0.0.3.tgz#c60917f26dc235661566c681061c303c2b28842b"
-  integrity sha1-xgkX8m3CNWYVZsaBBhwwPCsohCs=
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"

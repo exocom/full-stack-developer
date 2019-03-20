@@ -1,14 +1,19 @@
 ---
-  service: 
-    name: "workspace"
-  provider: 
-    name: "aws"
-    environment: "${file(../.env/${self:provider.stage}.yml):provider.environment, file(.env/${self:provider.stage}.yml):provider.environment}"
-    profile: "kalarrs"
-    region: "us-west-2"
-    stage: "${opt:stage, \"dev\"}"
-    apiGatewayRestApiName: "api-${self:provider.stage}"
-  plugins: 
-    - "@kalarrs/serverless-shared-api-gateway"
-    - "@kalarrs/serverless-domain-manager"
-    - "@kalarrs/serverless-workspace-utils"
+service:
+  name: "full-stack-developer-workspace"
+provider:
+  name: "aws"
+  environment: "${file(../.env/${self:provider.stage}.yml):provider.environment, file(.env/${self:provider.stage}.yml):provider.environment}"
+  profile: "kalarrs"
+  region: "us-west-2"
+  stage: "${opt:stage, \"dev\"}"
+resources:  # CloudFormation template syntax
+  Resources:
+    ToppingsBucket:
+      Type: AWS::S3::Bucket
+  Outputs:
+    ToppingsBucketName:
+      Value:
+        Ref: ToppingsBucket
+      Export:
+        Name: ToppingsBucket

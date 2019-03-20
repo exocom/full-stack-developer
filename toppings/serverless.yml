@@ -1,3 +1,4 @@
+---
 service: toppings
 
 plugins:
@@ -13,20 +14,20 @@ provider:
   memorySize: 128
   environment:
     TOPPING_COLLECTION: ${file(../serverless.yml):provider.environment.TOPPING_COLLECTION}
-    TOPPINGS_S3_BUCKET: ${cf:AttachmentsBucket}}
+    TOPPINGS_S3_BUCKET: ${cf:full-stack-developer-workspace-${file(../serverless.yml):provider.stage}.ToppingsBucketName}
 
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "s3:PutObject"
       Resource:
-        - Ref: ToppingsBucket
+        - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
     - Effect: "Allow"
       Action:
         - "s3:GetObject"
         - "s3:PutBucketNotification"
       Resource:
-        - Ref: ToppingsBucket
+        - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
 
 functions:
   handler:

@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "sync": "node scripts/sync",
+    "deployDev": "sls deploy --stage=dev",
+    "deployDevEast": "sls deploy --stage=dev --region=us-east-1",
+    "deployProd": "sls deploy --stage=prod",
+    "deployProdEast": "sls deploy --stage=prod --region=us-east-1"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.2"
+  }
+}
