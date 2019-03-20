@@ -1,9 +1,9 @@
 import {ObjectId} from 'mongodb';
 
-export interface Topping {
+export interface MongoTopping {
   id: ObjectId,
   name: string,
   image: {
-    url: string;
+    s3key: string;
   }
 }

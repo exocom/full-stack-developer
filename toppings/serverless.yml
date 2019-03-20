@@ -13,6 +13,7 @@ provider:
   stage: ${file(../serverless.yml):provider.stage}
   memorySize: 128
   environment:
+    MONGO_URI: ${file(../serverless.yml):provider.environment.MONGO_URI}
     TOPPING_COLLECTION: ${file(../serverless.yml):provider.environment.TOPPING_COLLECTION}
     TOPPINGS_S3_BUCKET: ${cf:full-stack-developer-workspace-${file(../serverless.yml):provider.stage}.ToppingsBucketName}
 
