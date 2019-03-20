@@ -11,6 +11,10 @@ const serverlessLocalServer = new StandaloneLocalDevServer({
   configOverride: {plugins: []}
 });
 
+const signedUrlRegExp = ({bucket, key}) => {
+  return new RegExp(`^https:\\/\\/${bucket}\.s3\.amazonaws\.com/${key}`)
+};
+
 describe('toppings', () => {
   const testData = {
     toppings: [
@@ -61,38 +65,115 @@ describe('toppings', () => {
 
       const {data} = JSON.parse(body);
       assert.equal(data.name, requestBody.name);
-      const imageUrlRegExp = new RegExp(`^https:\\/\\/${process.env.TOPPINGS_S3_BUCKET}\.s3\.amazonaws\.com/${name}\.${imageExt}`);
-      assert.match(data.image.url, imageUrlRegExp);
+      assert.match(data.image.url, signedUrlRegExp({
+        bucket: process.env.TOPPINGS_S3_BUCKET,
+        key: `${name}\.${imageExt}`
+      }));
     });
   });
 
   describe('create a topping with missing name', () => {
-    it('should return validation errors', () => {
-      return true;
+    const imageExt = 'png';
+    const requestBody = {
+      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [nameError] = error.validation;
+      const prop = 'name';
+      assert.equal(nameError.property, prop);
+      assert.equal(nameError.constraints.isDefined, `${prop} should not be null or undefined`);
+      assert.equal(nameError.constraints.maxLength, `${prop} must be shorter than or equal to 35 characters`);
+      assert.equal(nameError.constraints.minLength, `${prop} must be longer than or equal to 3 characters`);
     });
   });
 
+  describe('create a topping with name that is too short', () => {
+    const imageExt = 'png';
+    const name = 'ta';
+    const requestBody = {
+      name,
+      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [nameError] = error.validation;
+      const prop = 'name';
+      assert.equal(nameError.property, prop);
+      assert.isUndefined(nameError.constraints.isDefined);
+      assert.isUndefined(nameError.constraints.maxLength);
+      assert.equal(nameError.constraints.minLength, `${prop} must be longer than or equal to 3 characters`);
+    });
+  });
+
+  describe('create a topping with name that is too long', () => {
+    const imageExt = 'png';
+    const name = 'pepppppppppppppoooorrrrrnnnniiiiiiii';
+    const requestBody = {
+      name,
+      image: {"dataUrl": `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return validation errors', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Validation');
+      assert.equal(error.message, 'Failed validation');
+      assert.isArray(error.validation);
+
+      const [nameError] = error.validation;
+      const prop = 'name';
+      assert.equal(nameError.property, prop);
+      assert.isUndefined(nameError.constraints.isDefined);
+      assert.equal(nameError.constraints.maxLength, `${prop} must be shorter than or equal to 35 characters`);
+      assert.isUndefined(nameError.constraints.minLength);
+    });
+  });
+
+  /*
   describe('create a topping with missing image', () => {
-    it('should return validation errors', () => {
+    it('should return validation errors', async () => {
       return true;
     });
   });
 
   describe('create a topping with invalid image dataUrl', () => {
-    it('should return validation errors with a info about dataUrl format', () => {
+    it('should return validation errors with a info about dataUrl format', async () => {
       return true;
     });
   });
 
   describe('create a topping with the same name as an existing topping', () => {
-    it('should return a validation error', () => {
+    it('should return a validation error', async () => {
       return true;
     });
   });
 
   describe('create a topping, but then fails to save image to s3', () => {
-    it('should return a server error', () => {
+    it('should return a server error', async () => {
       return true;
     });
   });
+  */
 });

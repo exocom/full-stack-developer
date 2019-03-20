@@ -1,4 +1,4 @@
-import {IsNotEmpty, Length, ValidateNested} from 'class-validator';
+import {IsDefined, IsNotEmpty, MaxLength, MinLength, ValidateNested} from 'class-validator';
 
 class ImageDataUrl {
   @IsNotEmpty()
@@ -6,7 +6,9 @@ class ImageDataUrl {
 }
 
 export class CreateToppingRequest {
-  @Length(3, 10)
+  @IsDefined()
+  @MinLength(3)
+  @MaxLength(35)
   name: string;
 
   @ValidateNested()
