@@ -3,3 +3,6 @@ provider:
   environment:
     MONGO_URI: "mongodb+srv://demo:demo@cluster0-rxatp.mongodb.net/pizza?retryWrites=true"
     TOPPING_COLLECTION: "toppings"
+custom:
+  layers:
+    node-modules: arn:aws:lambda:us-west-2:948834093743:layer:full-stack-developer-node-modules-layer-dev:1

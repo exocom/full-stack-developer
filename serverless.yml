@@ -17,3 +17,5 @@ resources:  # CloudFormation template syntax
         Ref: ToppingsBucket
       Export:
         Name: ToppingsBucket
+custom:
+  layers: "${file(../.env/${self:provider.stage}.yml):custom.layers, file(.env/${self:provider.stage}.yml):custom.layers}"

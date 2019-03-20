@@ -19,7 +19,6 @@
     "js-yaml": "^3.12.2",
     "mocha": "^6.0.2",
     "mongo-unit": "^1.4.4",
-    "reflect-metadata": "^0.1.13",
     "request": "^2.88.0",
     "serverless": "^1.39.1",
     "serverless-webpack": "^5.2.0",
@@ -35,6 +34,7 @@
     "class-transformer": "^0.2.0",
     "class-validator": "^0.9.1",
     "moment": "^2.24.0",
-    "mongodb": "^3.1.13"
+    "mongodb": "^3.1.13",
+    "reflect-metadata": "^0.1.13"
   }
 }

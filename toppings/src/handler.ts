@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {deserialize, plainToClass} from 'class-transformer';
 import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
@@ -69,4 +70,13 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   const [mongoTopping] = results.ops;
   const topping = mapMongoToppingToTopping(mongoTopping);
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
+};
+
+
+export const getToppings: ApiGatewayHandler = async () => {
+  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const toppingCollection = client.db().collection(TOPPING_COLLECTION);
+
+  const results = await toppingCollection.find({}).toArray();
+  return apiGatewayUtil.sendJson({body: {data: results.map(mapMongoToppingToTopping)}});
 };
