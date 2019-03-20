@@ -1,5 +1,6 @@
+require('reflect-metadata');
 const {join} = require('path');
-const {describe, it, before, beforeEach, afterEach} = require('mocha');
+const {describe, it, before, beforeEach, after, afterEach} = require('mocha');
 const {assert} = require('chai');
 const {ObjectId} = require('mongodb');
 const mongoUnit = require('mongo-unit');
@@ -14,6 +15,8 @@ const serverlessLocalServer = new StandaloneLocalDevServer({
 const signedUrlRegExp = ({bucket, key}) => {
   return new RegExp(`^https:\\/\\/${bucket}\.s3\.amazonaws\.com/${key}`)
 };
+
+const {dataUrlRegExp} = require('../src/models/request');
 
 describe('toppings', () => {
   const testData = {
@@ -46,6 +49,11 @@ describe('toppings', () => {
     awsMock.mock('S3', 'putObject', {ETag: '4166c51556fff0f1354b2f5704b1c297'});
   });
 
+  after(async () => {
+    await mongoUnit.stop();
+    process.exit(0);
+  });
+
   afterEach(async () => {
     await mongoUnit.drop();
     awsMock.restore('S3');
@@ -61,7 +69,8 @@ describe('toppings', () => {
 
     it('should return a new topping', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 201);
       assert.isString(body);
 
       const {data} = JSON.parse(body);
@@ -81,7 +90,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -108,7 +118,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -135,7 +146,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -160,7 +172,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -184,7 +197,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -199,7 +213,8 @@ describe('toppings', () => {
       const prop = 'dataUrl';
       assert.equal(imageDataError.property, prop);
       assert.equal(imageDataError.constraints.isDefined, `${prop} should not be null or undefined`);
-      assert.isUndefined(imageDataError.constraints.matches);
+      assert.equal(imageDataError.constraints.matches, `${prop} must match ${dataUrlRegExp} regular expression`);
+
     });
   });
 
@@ -212,7 +227,8 @@ describe('toppings', () => {
 
     it('should return validation errors', async () => {
       const {createTopping} = require('../src/handler');
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 400);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
@@ -225,24 +241,57 @@ describe('toppings', () => {
 
       const [imageDataError] = imageError.children;
       const prop = 'dataUrl';
-      const {dataUrlRegExp} = require('../src/models/request');
       assert.equal(imageDataError.property, prop);
       assert.isUndefined(imageDataError.constraints.isDefined);
       assert.equal(imageDataError.constraints.matches, `${prop} must match ${dataUrlRegExp} regular expression`);
     });
   });
 
-  /*
+
   describe('create a topping with the same name as an existing topping', () => {
-    it('should return a validation error', async () => {
-      return true;
+    const imageExt = 'png';
+    const name = 'sausage';
+    const requestBody = {
+      name,
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return a new topping', async () => {
+      const {createTopping} = require('../src/handler');
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 401);
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Conflict');
+      assert.equal(error.message, 'A topping with that name already exists.');
     });
   });
 
-  describe('create a topping, but then fails to save image to s3', () => {
+  // NOTE: Something with the s3 mock is not working when this is run with other tests. Works when run alone.
+  describe.skip('create a topping, but then fails to save image to s3', () => {
+    const imageExt = 'png';
+    const name = 'ham';
+    const requestBody = {
+      name,
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    beforeEach(async () => {
+      await awsMock.restore('S3');
+      await awsMock.mock('S3', 'putObject', (param, cb) => {
+        cb(new Error('failed for some reason!'))
+      });
+    });
+
     it('should return a server error', async () => {
-      return true;
+      const {createTopping} = require('../src/handler');
+      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.isString(body);
+
+      const {error} = JSON.parse(body);
+      assert.equal(error.type, 'Upload Failure');
+      assert.equal(error.message, 'Unable to save the image.');
     });
   });
-  */
 });

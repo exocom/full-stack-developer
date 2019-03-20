@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import {deserialize, plainToClass} from 'class-transformer';
 import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
@@ -40,7 +39,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   const existingTopping = await toppingCollection.findOne({name});
   if (existingTopping) {
     const error = {
-      type: 'Validation',
+      type: 'Conflict',
       message: 'A topping with that name already exists.'
     };
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
@@ -48,17 +47,17 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 
   const matches = image.dataUrl.match(dataUrlRegExp);
   const [dataUrl, contentType, ext, base64data] = matches;
-  const result = await s3.putObject({
-    Bucket: TOPPINGS_S3_BUCKET,
-    Key: `${name}.${ext}`,
-    ContentType: contentType,
-    Body: Buffer.from(base64data, 'base64')
-  }).promise();
-
-  if (!result) {
+  try {
+    await s3.putObject({
+      Bucket: TOPPINGS_S3_BUCKET,
+      Key: `${name}.${ext}`,
+      ContentType: contentType,
+      Body: Buffer.from(base64data, 'base64')
+    }).promise();
+  } catch (e) {
     const error = {
       type: 'Upload Failure',
-      message: 'Unable to save the image'
+      message: 'Unable to save the image.'
     };
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
@@ -69,5 +68,5 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   });
   const [mongoTopping] = results.ops;
   const topping = mapMongoToppingToTopping(mongoTopping);
-  return apiGatewayUtil.sendJson({body: {data: topping}});
+  return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
 };
