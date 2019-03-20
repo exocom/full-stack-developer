@@ -1,5 +1,5 @@
 ---
 provider:
   environment:
-    MONGO_URI: "mongodb+srv://demo:demo@cluster0-rxatp.mongodb.net/pizza?authMechanism=SCRAM-SHA-1&authSource=pizza&retryWrites=true&ssl=true"
+    MONGO_URI: "mongodb+srv://demo:demo@cluster0-rxatp.mongodb.net/pizza?retryWrites=true"
     TOPPING_COLLECTION: "toppings"

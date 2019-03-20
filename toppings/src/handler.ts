@@ -11,17 +11,16 @@ const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
 
 
-const mapMongoToppingToTopping = ({id, image, name}: MongoTopping) => {
+const mapMongoToppingToTopping = ({_id, image, name}: MongoTopping) => {
   return {
-    id,
-    image: {url: s3.getSignedUrl('getObject', {Bucket: TOPPINGS_S3_BUCKET, key: image.s3key})},
+    id: _id,
+    image: {url: s3.getSignedUrl('getObject', {Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key})},
     name
   };
 };
 
 export const createTopping: ApiGatewayHandler = async (event) => {
-  const mongoConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
-  const client: MongoClient = await mongoConnect;
+  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const body = deserialize(CreateToppingRequest, event.body);
@@ -37,8 +36,15 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   }
 
   const {name, image} = body;
+  const existingTopping = await toppingCollection.findOne({name});
+  if (existingTopping) {
+    const error = {
+      type: 'Validation',
+      message: 'A topping with that name already exists.'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
+  }
 
-  // Save image to s3 bucket.
   const matches = image.dataUrl.match(/^data:(.*?\/(.*?));(.*$)/);
   if (!matches) {
     const error = {
@@ -49,7 +55,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
 
-  const [dataUrl, contentType, base64data, ext] = matches;
+  const [dataUrl, contentType, ext, base64data] = matches;
   const result = await s3.putObject({
     Bucket: TOPPINGS_S3_BUCKET,
     Key: `${name}.${ext}`,
@@ -66,10 +72,11 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
 
-  const mongoTopping = await toppingCollection.insertOne({
+  const results = await toppingCollection.insertOne({
     name,
     image: {s3key: `${name}.${ext}`}
   });
+  const [mongoTopping] = results.ops;
   const topping = mapMongoToppingToTopping(mongoTopping);
   return apiGatewayUtil.sendJson({body: {data: topping}});
 };
