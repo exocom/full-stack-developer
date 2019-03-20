@@ -40,11 +40,6 @@ describe('toppings', () => {
   beforeEach(async () => {
     await mongoUnit.initDb(process.env.MONGO_URI, testData);
     awsMock.mock('S3', 'putObject', {ETag: '4166c51556fff0f1354b2f5704b1c297'});
-    awsMock.mock('S3', 'listObjects', (a, b) => {
-      console.log(a, b);
-      return {Contents: [{Key: 'foo.wav'}]};
-    });
-    awsMock.mock('S3', 'getSignedUrl', (operation, params) => `https://${params.Bucket}.s3.us-west-2.amazonaws.com/${params.Key}`);
   });
   afterEach(async () => {
     await mongoUnit.drop();
@@ -65,8 +60,9 @@ describe('toppings', () => {
       assert.isString(body);
 
       const {data} = JSON.parse(body);
-      assert.equal(requestBody.name, data.name);
-      assert.equal(`https://${process.env.TOPPINGS_S3_BUCKET}.s3.us-west-2.amazonaws.com/${name}.${imageExt}`, await data.image.url);
+      assert.equal(data.name, requestBody.name);
+      const imageUrlRegExp = new RegExp(`^https:\\/\\/${process.env.TOPPINGS_S3_BUCKET}\.s3\.amazonaws\.com/${name}\.${imageExt}`);
+      assert.match(data.image.url, imageUrlRegExp);
     });
   });
 
