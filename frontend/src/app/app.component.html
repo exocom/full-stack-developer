@@ -1,3 +1,21 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-menu contentId="content">
+    <ion-content>
+      <ion-list>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item routerLink="/toppings" routerLinkActive="active">
+            <ion-icon slot="start" src="/assets/harvest.svg"></ion-icon>
+            <ion-label>Toppings</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item routerLink="/pizza" routerLinkActive="active">
+            <ion-icon slot="start" src="/assets/pizza.svg"></ion-icon>
+            <ion-label>Pizza Pies</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="content"></ion-router-outlet>
 </ion-app>
