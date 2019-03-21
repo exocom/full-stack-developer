@@ -431,7 +431,7 @@ describe('toppings', () => {
     });
   });
 
-  describe('update an new topping', () => {
+  describe('update a new topping', () => {
     const imageExt = 'png';
     const name = 'honey';
     const toppingId = ObjectId().toString();
