@@ -1,9 +1,21 @@
-ion-title {
+.bg {
+  filter: blur(3px) brightness(80%) contrast(100%) opacity(55%);
+  position: absolute;
+  object-fit: cover;
+  height: 100%;
+  z-index: -1;
+}
+
+h1 {
+  font-size: 40px;
   text-align: center;
-  ion-img {
-    display: inline-block;
-    width: 26px;
-    top: 10px;
-    margin-bottom: -10px;
-  }
+}
+
+h2 ion-img.logo {
+  padding-right: 10px;
+  font-weight: bold;
+}
+
+ion-content {
+  --background: none;
 }

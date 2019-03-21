@@ -1,11 +1,14 @@
 // Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/theming/
-@import url('https://fonts.googleapis.com/css?family=Indie+Flower');
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower|Lato');
 
 
 /** Ionic CSS Variables **/
 :root {
-  --ion-font-family: 'Indie Flower', cursive;;
+  --indie-flower: 'Indie Flower', cursive;
+  --lato: 'Lato', sans-serif;
+
+  --ion-font-family: var(--indie-flower);
 
   /** primary **/
   --ion-color-primary: #3880ff;

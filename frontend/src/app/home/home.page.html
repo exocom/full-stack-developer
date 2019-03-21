@@ -1,19 +1,38 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>
-      <ion-img src="/assets/logo.png"></ion-img> Tasty Pie
-    </ion-title>
-  </ion-toolbar>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <!--<ion-title>-->
+        <!--<ion-img src="/assets/logo.png"></ion-img> Tasty Pie-->
+        <!--</ion-title>-->
+    </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="ion-padding">
-    <!--<h1>Tasty Pie!</h1>-->
-    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
-  </div>
+<ion-content forceOverscroll="false">
+    <img src="/assets/pizza-on-cut-board.jpg" class="bg"/>
+
+    <div class="ion-padding" flex-row style="height: 100%">
+        <h2 flex align-items-center justify-content-center>
+            <ion-img src="/assets/logo.png" class="logo"></ion-img>
+            <ion-text>Tasty Pie</ion-text>
+        </h2>
+        <div flex align-items-center justify-content-center style="flex-grow: 1">
+            <h1>
+                Real. Healthy.
+                <br/>
+                Authentic.
+            </h1>
+        </div>
+
+        <div class="ion-padding">
+            <ion-button size="full">Toppings</ion-button>
+            <ion-button size="full">Pizza Pies</ion-button>
+        </div>
+        <ion-text class="ion-text-center">
+            &copy; 2020
+        </ion-text>
+    </div>
 
 
 </ion-content>
