@@ -9,7 +9,7 @@ provider:
 
 layers:
   node_modules:
-    name: node-modules-${self:provider.stage}
+    name: full-stack-developer-node-modules-${self:provider.stage}
     path: src
     compatibleRuntimes:
       - nodejs8.10

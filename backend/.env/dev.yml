@@ -6,4 +6,4 @@ provider:
     PIZZA_COLLECTION: "pizzas"
 custom:
   layers:
-    node-modules: arn:aws:lambda:us-west-2:948834093743:layer:full-stack-developer-node-modules-layer-dev:1
+    node-modules: ${ssm:dev_node-modules-layer-arn}
