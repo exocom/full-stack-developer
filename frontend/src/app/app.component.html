@@ -2,16 +2,23 @@
   <ion-menu contentId="content">
     <ion-content>
       <ion-list>
+        <!--
         <ion-menu-toggle auto-hide="false">
-          <ion-item routerLink="/toppings" routerLinkActive="active">
+          <ion-item routerLink="/home" routerLinkActive #rlaHome="routerLinkActive">
+            <ion-label [color]="rlaHome.isActive ? 'primary' : ''">Home</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        -->
+        <ion-menu-toggle auto-hide="false">
+          <ion-item routerLink="/toppings" routerLinkActive #rlaToppings="routerLinkActive">
             <ion-icon slot="start" src="/assets/harvest.svg"></ion-icon>
-            <ion-label>Toppings</ion-label>
+            <ion-label [color]="rlaToppings.isActive ? 'primary' : ''">Toppings</ion-label>
           </ion-item>
         </ion-menu-toggle>
         <ion-menu-toggle auto-hide="false">
-          <ion-item routerLink="/pizza" routerLinkActive="active">
+          <ion-item routerLink="/pizzas" routerLinkActive #rlaPizzas="routerLinkActive">
             <ion-icon slot="start" src="/assets/pizza.svg"></ion-icon>
-            <ion-label>Pizza Pies</ion-label>
+            <ion-label [color]="rlaPizzas.isActive ? 'primary' : ''">Pizza Pies</ion-label>
           </ion-item>
         </ion-menu-toggle>
       </ion-list>
