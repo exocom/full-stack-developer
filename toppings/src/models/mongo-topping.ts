@@ -1,5 +1,5 @@
 import {ObjectId} from 'mongodb';
-import {ToppingType} from './toppings';
+import {ToppingType} from './topping';
 
 export interface MongoTopping {
   _id: ObjectId;

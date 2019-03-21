@@ -17,7 +17,7 @@ const signedUrlRegExp = ({bucket, key}) => {
 };
 
 const {dataUrlRegExp} = require('../src/models/request');
-const {ToppingType} = require('../src/models/toppings');
+const {ToppingType} = require('../src/models/topping');
 
 describe('toppings', () => {
   const testData = {
@@ -316,7 +316,6 @@ describe('toppings', () => {
     });
   });
 
-
   describe('create a topping with the same name as an existing topping', () => {
     const imageExt = 'png';
     const name = 'sausage';
@@ -381,7 +380,6 @@ describe('toppings', () => {
       assert.isDefined(topping.image.url);
     });
   });
-
 
   describe('delete topping', () => {
     it('should return nothing', async () => {

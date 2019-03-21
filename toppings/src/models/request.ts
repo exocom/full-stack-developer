@@ -1,6 +1,6 @@
 import {IsDefined, IsEnum, Matches, MaxLength, MinLength, ValidateNested, ValidationOptions} from 'class-validator';
 import {Transform, Type} from 'class-transformer';
-import {ToppingType} from './toppings';
+import {ToppingType} from './topping';
 import {ObjectId} from 'mongodb';
 
 export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;

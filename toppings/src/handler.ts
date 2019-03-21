@@ -17,8 +17,7 @@ const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET} = process.env;
 const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
 
-
-const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping) => {
+export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping) => {
   return {
     id: _id,
     name,
@@ -97,7 +96,6 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
 
   return apiGatewayUtil.sendJson({statusCode: deletedCount === 0 ? 404 : 204});
 };
-
 
 export const updateTopping: ApiGatewayHandler = async (event) => {
   const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
