@@ -1,7 +1,7 @@
 ---
 provider:
   environment:
-    MONGO_URI: "mongodb+srv://demo:demo@cluster0-rxatp.mongodb.net/pizza?retryWrites=true"
+    MONGO_URI: ${ssm:DEV_MONGO_URI~true}
     TOPPING_COLLECTION: "toppings"
     PIZZA_COLLECTION: "pizzas"
 custom:
