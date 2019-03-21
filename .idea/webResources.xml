@@ -8,6 +8,8 @@
             <path value="file://$PROJECT_DIR$/toppings/src" />
             <path value="file://$PROJECT_DIR$/toppings" />
             <path value="file://$PROJECT_DIR$/layers/node-modules" />
+            <path value="file://$PROJECT_DIR$/pizzas" />
+            <path value="file://$PROJECT_DIR$/pizzas/src" />
           </resourceRoots>
         </entryData>
       </entry>
