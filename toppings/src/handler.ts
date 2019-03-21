@@ -2,7 +2,13 @@ import 'reflect-metadata';
 import {deserialize, plainToClass} from 'class-transformer';
 import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
-import {CreateToppingBody, dataUrlRegExp, DeleteToppingPathParameters} from './models/request';
+import {
+  CreateToppingBody,
+  dataUrlRegExp,
+  DeleteToppingPathParameters,
+  UpdateToppingBody,
+  UpdateToppingPathParameters
+} from './models/request';
 import {MongoClient} from 'mongodb';
 import {S3} from 'aws-sdk';
 import {MongoTopping} from './models/mongo-topping';
@@ -64,12 +70,12 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
 
-  const results = await toppingCollection.insertOne({
+  const {ops} = await toppingCollection.insertOne({
     name,
     type,
     image: {s3key: `${name}.${ext}`}
   });
-  const [mongoTopping] = results.ops;
+  const [mongoTopping] = ops;
   const topping = mapMongoToppingToTopping(mongoTopping);
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
 };
@@ -78,8 +84,8 @@ export const getToppings: ApiGatewayHandler = async () => {
   const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
-  const results = await toppingCollection.find({}).toArray();
-  return apiGatewayUtil.sendJson({body: {data: results.map(mapMongoToppingToTopping)}});
+  const mongoToppings = await toppingCollection.find({}).toArray();
+  return apiGatewayUtil.sendJson({body: {data: mongoToppings.map(mapMongoToppingToTopping)}});
 };
 
 export const deleteTopping: ApiGatewayHandler = async (event) => {
@@ -90,4 +96,60 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
   const {deletedCount} = await toppingCollection.deleteOne({_id: toppingId});
 
   return apiGatewayUtil.sendJson({statusCode: deletedCount === 0 ? 404 : 204});
+};
+
+
+export const updateTopping: ApiGatewayHandler = async (event) => {
+  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const toppingCollection = client.db().collection(TOPPING_COLLECTION);
+
+  const {toppingId} = plainToClass(UpdateToppingPathParameters, event.pathParameters);
+  const body = deserialize(UpdateToppingBody, event.body);
+  const bodyErrors = await validate(body) || [];
+  if (bodyErrors.length) {
+    const validation = [...bodyErrors];
+    const error = {
+      type: 'Validation',
+      message: 'Failed validation',
+      validation
+    };
+    return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
+  }
+
+  if (body.id.toString() !== toppingId.toString()) {
+    const error = {
+      type: 'Validation',
+      message: `Mismatch between the id in the path and the id in the body. Id is immutable values must be the same.`
+    };
+    return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
+  }
+
+  const {name, type, image} = body;
+  const matches = image.dataUrl.match(dataUrlRegExp);
+  const [dataUrl, contentType, ext, base64data] = matches;
+  try {
+    await s3.putObject({
+      Bucket: TOPPINGS_S3_BUCKET,
+      Key: `${name}.${ext}`,
+      ContentType: contentType,
+      Body: Buffer.from(base64data, 'base64')
+    }).promise();
+  } catch (e) {
+    const error = {
+      type: 'Upload Failure',
+      message: 'Unable to save the image.'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
+  }
+
+  const {lastErrorObject, value} = await toppingCollection.findOneAndUpdate({_id: toppingId}, {
+    $set: {
+      name,
+      type,
+      image: {s3key: `${name}.${ext}`}
+    }
+  }, {upsert: true, returnOriginal: false});
+
+  const topping = mapMongoToppingToTopping(value);
+  return apiGatewayUtil.sendJson({statusCode: lastErrorObject.updatedExisting ? 200 : 201, body: {data: topping}});
 };

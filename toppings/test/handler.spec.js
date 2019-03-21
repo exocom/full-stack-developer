@@ -402,4 +402,60 @@ describe('toppings', () => {
       assert.isEmpty(body);
     });
   });
+
+  describe('update an existing topping', () => {
+    const name = 'onion';
+    const imageExt = 'png';
+    const {_id} = testData.toppings[0];
+    const toppingId = _id.toString();
+    const requestBody = {
+      id: toppingId,
+      name,
+      type: ToppingType.Vegetable,
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return an updated topping', async () => {
+      const {updateTopping} = handler;
+      const {body, statusCode} = await updateTopping({body: JSON.stringify(requestBody), pathParameters: {toppingId}});
+      assert.equal(statusCode, 200);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.equal(data.name, requestBody.name);
+      assert.equal(data.type, requestBody.type);
+      assert.match(data.image.url, signedUrlRegExp({
+        bucket: process.env.TOPPINGS_S3_BUCKET,
+        key: `${name}\.${imageExt}`
+      }));
+    });
+  });
+
+  describe('update an new topping', () => {
+    const imageExt = 'png';
+    const name = 'honey';
+    const toppingId = ObjectId().toString();
+    const requestBody = {
+      id: toppingId,
+      name,
+      type: ToppingType.Sauce,
+      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+    };
+
+    it('should return an updated topping', async () => {
+      const {updateTopping} = handler;
+      const {body, statusCode} = await updateTopping({body: JSON.stringify(requestBody), pathParameters: {toppingId}});
+      //assert.equal(statusCode, 201);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.equal(data.id, requestBody.id);
+      assert.equal(data.name, requestBody.name);
+      assert.equal(data.type, requestBody.type);
+      assert.match(data.image.url, signedUrlRegExp({
+        bucket: process.env.TOPPINGS_S3_BUCKET,
+        key: `${name}\.${imageExt}`
+      }));
+    });
+  });
 });
