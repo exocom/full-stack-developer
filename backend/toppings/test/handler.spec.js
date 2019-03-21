@@ -39,7 +39,8 @@ describe('toppings', () => {
 
   let handler;
 
-  before(async () => {
+  before(async function () {
+    this.timeout(30 * 1000);
     const mongoUri = await mongoUnit.start();
     await serverlessLocalServer.loadServerlessYaml();
     process.env = {

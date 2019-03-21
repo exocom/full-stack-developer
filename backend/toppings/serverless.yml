@@ -56,18 +56,6 @@ functions:
     events:
       - http: PUT toppings/{toppingId}
 
-resources:  # CloudFormation template syntax
-  Resources:
-    ToppingsBucket:
-      Type: AWS::S3::Bucket
-
-  Outputs:
-    AttachmentsBucketName:
-      Value:
-        Ref: AttachmentsBucket
-      Export:
-        Name: ${self:service}:${file(../serverless.yml):provider.stage}:AttachmentsBucket
-
 custom:
   localDevPort: 5000
   webpack:
