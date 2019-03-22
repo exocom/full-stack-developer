@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>
       <ion-img src="/assets/logo.png" class="logo"></ion-img>
-      Tasty Pie
+      Tasty Pie<ion-badge *ngIf="toppings$ | async as toppings" color="primary">{{toppings.length || 0}}</ion-badge>
     </ion-title>
     <ion-icon slot="end" name="md-apps" size="large"></ion-icon>
     <ion-icon slot="end" name="list" size="large" color="medium"></ion-icon>

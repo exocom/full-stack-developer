@@ -2,8 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {PizzaService} from '../../services/pizza.service';
 import {map, tap} from 'rxjs/operators';
 import {Topping, ToppingType} from '../../services/contract/models/topping';
-import {MatBottomSheet} from '@angular/material';
-import {NesControllerBottomSheetComponent} from '../../bottom-sheets/nes-controller/nes-controller-bottom-sheet.component';
 
 @Component({
   selector: 'app-toppings',
@@ -12,7 +10,9 @@ import {NesControllerBottomSheetComponent} from '../../bottom-sheets/nes-control
 })
 export class ToppingsPage implements OnInit {
   loading = {toppings: true};
-  toppingsGroupByType$ = this.pizzaService.getToppings().pipe(
+  toppings$ = this.pizzaService.getToppings();
+
+  toppingsGroupByType$ = this.toppings$.pipe(
     tap(() => this.loading.toppings = false),
     map((toppings) => {
       return Object.values(ToppingType).map((toppingType): { type: ToppingType, toppings: Array<Topping> } => {
