@@ -5,20 +5,34 @@
     <span class="grey"></span>
 
     <div class="mid-buttons">
-      <a href="#" class="select"> </a>
-      <a href="#" class="start"> </a>
+      <span class="select" (click)="pushButton('select')"> </span>
+      <audio #selectAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+
+      <span class="start" (click)="pushButton('start')"> </span>
+      <audio #startAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
     </div>
 
     <div class="dpad">
       <span class="plus"></span>
       <span class="plus2"></span>
-      <span class="thumb1"></span>
-      <span class="thumb2"></span>
-      <span class="thumb3"></span>
-      <span class="thumb4"></span>
+
+      <span class="thumb1" (click)="pushButton('left')"></span>
+      <audio #leftAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+
+      <span class="thumb2" (click)="pushButton('up')"></span>
+      <audio #upAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+
+      <span class="thumb3" (click)="pushButton('right')"></span>
+      <audio #rightAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+
+      <span class="thumb4" (click)="pushButton('down')"></span>
+      <audio #downAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
     </div>
 
-    <a href="#" class="b"></a>
-    <a href="#" class="a"></a>
+    <span class="b" (click)="pushButton('b')"></span>
+    <audio #bAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+
+    <span class="a" (click)="pushButton('a')"></span>
+    <audio #aAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
   </div>
 </div>

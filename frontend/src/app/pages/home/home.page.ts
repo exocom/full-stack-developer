@@ -13,7 +13,6 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => this.openBottomSheet(), 500);
   }
 
   openBottomSheet(): void {
