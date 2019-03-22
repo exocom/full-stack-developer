@@ -35,3 +35,15 @@ ion-title {
   display: flex;
   flex-direction: column;
 }
+
+
+.cloud-message {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+}
+
+ion-item {
+  font-family: var(--lato);
+}

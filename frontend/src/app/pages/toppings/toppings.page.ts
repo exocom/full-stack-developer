@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {PizzaService} from '../../services/pizza.service';
+import {map, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-toppings',
@@ -7,8 +8,11 @@ import {PizzaService} from '../../services/pizza.service';
   styleUrls: ['./toppings.page.scss']
 })
 export class ToppingsPage implements OnInit {
-
-  toppings$ = this.pizzaService.getToppings();
+  loading = {toppings: true};
+  toppings$ = this.pizzaService.getToppings().pipe(
+    tap(() => this.loading.toppings = false),
+    // map(() => null)
+  );
 
   constructor(private pizzaService: PizzaService) {
   }

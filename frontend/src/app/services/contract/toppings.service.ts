@@ -13,7 +13,8 @@ import {CreateToppingBody} from './models/request';
 export class ToppingsService {
   private url = 'https://8e08gjdc3d.execute-api.us-west-2.amazonaws.com/dev/';
   private httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'})
+    headers: new HttpHeaders({'Content-Type': 'application/json'}),
+    reportProgress: true
   };
 
   constructor(private http: HttpClient) {

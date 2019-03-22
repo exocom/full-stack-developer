@@ -1,0 +1,11 @@
+<div padding-horizontal flex-row align-items-center>
+  <div padding-horizontal>
+    <ion-img [src]="'/assets/clouds/'+ type +'.svg'" alt=""></ion-img>
+    <slot name="image"></slot>
+  </div>
+  <div class="message">
+    <ng-content select="h1" class="h1"></ng-content>
+    <ng-content select="p" class="p"></ng-content>
+  </div>
+  <ng-content select="ion-note"></ng-content>
+</div>
