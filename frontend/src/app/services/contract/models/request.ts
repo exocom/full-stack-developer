@@ -26,3 +26,9 @@ export class UpdateToppingBody {
   type: ToppingType;
   image: ImageDataUrl;
 }
+
+
+export class CreatePizzaBody {
+  name: string;
+  // TODO : props.
+}

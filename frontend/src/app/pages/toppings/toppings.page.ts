@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {PizzaService} from '../../services/pizza.service';
+import {PizzaStoreService} from '../../services/pizza-store.service';
 import {map, take} from 'rxjs/operators';
 import {Topping, ToppingType} from '../../services/contract/models/topping';
 import {AlertController, ModalController, ToastController} from '@ionic/angular';
@@ -11,7 +11,7 @@ import {ToppingModalComponent} from '../../modals/topping/topping-modal.componen
   styleUrls: ['./toppings.page.scss']
 })
 export class ToppingsPage implements OnInit {
-  toppings$ = this.pizzaService.getToppings();
+  toppings$ = this.pizzaStoreService.getToppings();
 
   toppingsGroupByType$ = this.toppings$.pipe(
     map((toppings) => {
@@ -26,7 +26,7 @@ export class ToppingsPage implements OnInit {
 
   constructor(public alertController: AlertController,
               public modalController: ModalController,
-              private pizzaService: PizzaService,
+              private pizzaStoreService: PizzaStoreService,
               private toastCtrl: ToastController) {
   }
 
@@ -46,7 +46,7 @@ export class ToppingsPage implements OnInit {
         {
           text: 'Okay',
           handler: () => {
-            this.pizzaService.removeTopping({topping}).subscribe(async () => {
+            this.pizzaStoreService.removeTopping({topping}).subscribe(async () => {
               const toast = await this.toastCtrl.create({color: 'secondary', message: 'Your topping has been removed.', duration: 3000});
               await toast.present();
             }, async () => {

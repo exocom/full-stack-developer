@@ -7,5 +7,6 @@ export interface MongoPizza {
   name: string;
   crust: CrustType;
   size: PizzaSize;
-  toppings: Array<MongoTopping>
+  price: number;
+  toppings: Array<MongoTopping>;
 }

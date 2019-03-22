@@ -1,5 +1,4 @@
-import {ObjectId} from 'mongodb';
-import {Topping} from '../../../toppings/src/models/topping';
+import {Topping} from '../models/topping';
 
 export enum CrustType {
   Regular = 'regular',
@@ -15,11 +14,12 @@ export enum PizzaSize {
   XLarge = 'x-large'
 }
 
-export interface Pizza {
-  id: ObjectId;
+export class Pizza {
+  id: string;
   name: string;
   crust: CrustType;
   size: PizzaSize;
   price: number;
+
   toppings: Array<Topping>;
 }

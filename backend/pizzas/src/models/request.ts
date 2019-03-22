@@ -24,6 +24,9 @@ export class CreatePizzaBody {
   @IsEnum(PizzaSize, enumCustomErrorMessage)
   size: PizzaSize;
 
+  @IsDefined()
+  price: number;
+
   @ValidateNested()
   toppings: Array<UpdateToppingBody>;
 }
@@ -54,6 +57,9 @@ export class UpdatePizzaBody {
 
   @IsEnum(PizzaSize, enumCustomErrorMessage)
   size: PizzaSize;
+
+  @IsDefined()
+  price: number;
 
   @ValidateNested()
   toppings: Array<UpdateToppingBody>;

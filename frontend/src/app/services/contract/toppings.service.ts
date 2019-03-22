@@ -31,8 +31,6 @@ export class ToppingsService {
   }
 
   removeTopping(toppingId): Observable<void> {
-    return this.http.delete<ApiResponse<Topping>>(`${this.url}/toppings/${toppingId}`, this.httpOptions)
-      .pipe(map(() => {
-      }));
+    return this.http.delete<void>(`${this.url}/toppings/${toppingId}`, this.httpOptions);
   }
 }
