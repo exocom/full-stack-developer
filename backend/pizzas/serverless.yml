@@ -30,25 +30,37 @@ functions:
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: POST pizzas
+      - http:
+          method: POST
+          path: pizzas
+          cors: true
   getPizzas:
     handler: src/handler.getPizzas
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: GET pizzas
+      - http:
+          method: GET
+          path: pizzas
+          cors: true
   deletePizza:
     handler: src/handler.deletePizza
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: DELETE pizzas/{pizzaId}
+      - http:
+          method: DELETE
+          path: pizzas/{pizzaId}
+          cors: true
   updatePizza:
     handler: src/handler.updatePizza
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: PUT toppings/{toppingId}
+      - http:
+          method: PUT
+          path: toppings/{toppingId}
+          cors: true
 
 custom:
   localDevPort: 5000

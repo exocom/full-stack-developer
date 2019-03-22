@@ -36,19 +36,29 @@ functions:
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: POST toppings
+      - http:
+          method: POST
+          path: toppings
+          cors: true
   getToppings:
     handler: src/handler.getToppings
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: GET toppings
+      - http:
+          method: GET
+          path: toppings
+          cors: true
   deleteTopping:
     handler: src/handler.deleteTopping
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: DELETE toppings/{toppingId}
+      - http:
+          method: DELETE
+          path: toppings/{toppingId}
+          cors: true
+
   updateTopping:
     handler: src/handler.updateTopping
     layers:
