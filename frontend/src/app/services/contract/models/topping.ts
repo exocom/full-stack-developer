@@ -1,4 +1,4 @@
-import {ObjectId} from 'mongodb';
+import {ObjectId} from 'bson';
 
 export enum ToppingType {
   Cheese = 'cheese',
@@ -9,8 +9,8 @@ export enum ToppingType {
   Seasoning = 'seasoning'
 }
 
-export interface Topping {
-  id: ObjectId;
+export class Topping {
+  id: string;
   name: string;
   type: ToppingType;
   image: {

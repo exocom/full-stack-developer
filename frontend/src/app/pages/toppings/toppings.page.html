@@ -11,5 +11,12 @@
 </ion-header>
 
 <ion-content>
-    <h1>Toppings!</h1>
+    <ng-container *ngIf="toppings$ | async as toppings; else noToppings">
+        You got toppings
+        <pre>{{toppings|json}}</pre>
+    </ng-container>
+
+    <ng-template #noToppings>
+        WAT!
+    </ng-template>
 </ion-content>
