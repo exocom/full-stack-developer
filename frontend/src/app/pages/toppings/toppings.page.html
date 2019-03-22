@@ -47,18 +47,16 @@
   </ng-container>
 
   <ng-template #loadingToppings>
-    <ion-progress-bar color="tertiary"></ion-progress-bar>
+    <ion-progress-bar type="indeterminate" color="tertiary"></ion-progress-bar>
   </ng-template>
   <ng-template #noToppings>
-    <ng-container>
-      <app-pizza-message emoji="crumbs" class="fill">
-        <h1 no-margin>
-          <ion-text color="danger">Umm sorry.</ion-text>
-        </h1>
-        <p no-margin>Looks like you don't have any ingredients</p>
-        <!--<ion-note margin-top>Hint: Then try again to see if the camera activates.</ion-note>-->
-      </app-pizza-message>
-    </ng-container>
+    <app-pizza-message emoji="crumbs" class="fill">
+      <h1 no-margin>
+        <ion-text color="danger">Umm sorry.</ion-text>
+      </h1>
+      <p no-margin>Looks like you don't have any ingredients</p>
+      <!--<ion-note margin-top>Hint: Then try again to see if the camera activates.</ion-note>-->
+    </app-pizza-message>
   </ng-template>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

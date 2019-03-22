@@ -11,7 +11,7 @@ import {Pizza} from './models/pizza';
   providedIn: 'root'
 })
 export class PizzasService {
-  private url = 'https://xxx.execute-api.us-west-2.amazonaws.com/dev';
+  private url = 'https://iiiybaz72h.execute-api.us-west-2.amazonaws.com/dev';
   private httpOptions = {
     headers: new HttpHeaders({'Content-Type': 'application/json'}),
     reportProgress: true

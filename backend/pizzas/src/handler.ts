@@ -20,8 +20,10 @@ const mapMongoPizzaToPizza = ({_id, name, crust, size, toppings}: MongoPizza) =>
   };
 };
 
+const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+
 export const createPizza: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const pizzaCollection = client.db().collection(PIZZA_COLLECTION);
 
   const body = deserialize(CreatePizzaBody, event.body);
@@ -58,7 +60,7 @@ export const createPizza: ApiGatewayHandler = async (event) => {
 };
 
 export const getPizzas: ApiGatewayHandler = async () => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const pizzaCollection = client.db().collection(PIZZA_COLLECTION);
 
   const mongoPizzas = await pizzaCollection.find({}).toArray();
@@ -66,7 +68,7 @@ export const getPizzas: ApiGatewayHandler = async () => {
 };
 
 export const deletePizza: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const pizzaCollection = client.db().collection(PIZZA_COLLECTION);
 
   const {pizzaId} = plainToClass(DeletePizzaPathParameters, event.pathParameters);
@@ -76,7 +78,7 @@ export const deletePizza: ApiGatewayHandler = async (event) => {
 };
 
 export const updatePizza: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const pizzaCollection = client.db().collection(PIZZA_COLLECTION);
 
   const {pizzaId} = plainToClass(UpdatePizzaPathParameters, event.pathParameters);

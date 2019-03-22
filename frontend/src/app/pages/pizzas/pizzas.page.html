@@ -11,19 +11,27 @@
 </ion-header>
 
 <ion-content>
-  <h1>Pizzas!</h1>
-
-
-  <ng-template #noPizzas>
-    <ion-progress-bar *ngIf="loading.pizzas" color="tertiary"></ion-progress-bar>
-    <ng-container *ngIf="!loading.pizzas">
-      <app-cloud-message emoji="crumbs" class="fill">
-        <h1 no-margin>
-          <ion-text color="danger">Umm sorry.</ion-text>
-        </h1>
-        <p no-margin>Looks like you don't have any pizzas</p>
-        <!--<ion-note margin-top>Hint: Then try again to see if the camera activates.</ion-note>-->
-      </app-cloud-message>
+  <ng-container *ngIf="pizzas$ | async as pizzas else loadingPizzas">
+    <ng-container *ngIf="pizzas.length else noPizzas">
     </ng-container>
+  </ng-container>
+
+  <ng-template #loadingPizzas>
+    <ion-progress-bar type="indeterminate" color="tertiary"></ion-progress-bar>
   </ng-template>
+  <ng-template #noPizzas>
+    <app-cloud-message emoji="crumbs" class="fill">
+      <h1 no-margin>
+        <ion-text color="danger">Umm sorry.</ion-text>
+      </h1>
+      <p no-margin>Looks like you don't have any pizzas</p>
+      <!--<ion-note margin-top>Hint: Then try again to see if the camera activates.</ion-note>-->
+    </app-cloud-message>
+  </ng-template>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="createPizza()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
