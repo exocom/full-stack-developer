@@ -25,8 +25,14 @@ export class ToppingsService {
       .pipe(map(body => plainToClass(Topping, body.data)));
   }
 
-  createTopping(request: { body: CreateToppingBody; }): Observable<Topping> {
-    return this.http.post<ApiResponse<Topping>>(`${this.url}/toppings`, request.body, this.httpOptions)
+  createTopping(createToppingBody: CreateToppingBody): Observable<Topping> {
+    return this.http.post<ApiResponse<Topping>>(`${this.url}/toppings`, createToppingBody, this.httpOptions)
       .pipe(map(body => plainToClass(Topping, body.data)));
+  }
+
+  removeTopping(toppingId): Observable<void> {
+    return this.http.delete<ApiResponse<Topping>>(`${this.url}/toppings/${toppingId}`, this.httpOptions)
+      .pipe(map(() => {
+      }));
   }
 }

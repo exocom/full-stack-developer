@@ -5,7 +5,8 @@
     </ion-buttons>
     <ion-title>
       <ion-img src="/assets/logo.png" class="logo"></ion-img>
-      Tasty Pie<ion-badge *ngIf="toppings$ | async as toppings" color="primary">{{toppings.length || 0}}</ion-badge>
+      Tasty Pie
+      <ion-badge *ngIf="toppings$ | async as toppings" color="primary">{{toppings.length || 0}}</ion-badge>
     </ion-title>
     <ion-icon slot="end" name="md-apps" size="large"></ion-icon>
     <ion-icon slot="end" name="list" size="large" color="medium"></ion-icon>
@@ -13,35 +14,43 @@
 </ion-header>
 
 <ion-content>
-  <ng-container *ngIf="toppingsGroupByType$ | async as toppingsByType; else noToppings">
-    <ion-list lines="none">
-      <ng-container *ngFor="let toppingGroup of toppingsByType">
-        <ion-list-header>
-          <ion-text color="primary">{{toppingGroup.type}}</ion-text>
-        </ion-list-header>
-        <ion-item-sliding *ngFor="let topping of toppingGroup.toppings">
-          <ion-item>
-            <ion-avatar slot="start">
-              <ion-img [src]="topping.image.url"></ion-img>
-            </ion-avatar>
-            <ion-label>{{topping.name}}</ion-label>
-          </ion-item>
+  <ng-container *ngIf="toppings$ | async as toppings else loadingToppings">
+    <ng-container *ngIf="toppings.length && toppingsGroupByType$ | async as toppingsByType else noToppings">
+      <ion-list lines="none">
+        <ng-container *ngFor="let toppingGroup of toppingsByType">
+          <ion-list-header>
+            <ion-text color="primary">{{toppingGroup.type}}</ion-text>
+          </ion-list-header>
+          <ion-item-sliding *ngFor="let topping of toppingGroup.toppings">
+            <ion-item>
+              <ion-avatar slot="start">
+                <ion-img [src]="topping.image.url"></ion-img>
+              </ion-avatar>
+              <ion-label>{{topping.name}}</ion-label>
+            </ion-item>
 
-          <ion-item-options side="start">
-            <ion-item-option (click)="editTopping(topping)"><ion-icon name="create" size="large"></ion-icon></ion-item-option>
-          </ion-item-options>
+            <ion-item-options side="start">
+              <ion-item-option (click)="editTopping(topping)">
+                <ion-icon name="create" size="large"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
 
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="removeTopping(topping)"><ion-icon name="trash" size="large"></ion-icon></ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ng-container>
-    </ion-list>
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="removeTopping(topping)">
+                <ion-icon name="trash" size="large"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        </ng-container>
+      </ion-list>
+    </ng-container>
   </ng-container>
 
+  <ng-template #loadingToppings>
+    <ion-progress-bar color="tertiary"></ion-progress-bar>
+  </ng-template>
   <ng-template #noToppings>
-    <ion-progress-bar *ngIf="loading.toppings" color="tertiary"></ion-progress-bar>
-    <ng-container *ngIf="!loading.toppings">
+    <ng-container>
       <app-pizza-message emoji="crumbs" class="fill">
         <h1 no-margin>
           <ion-text color="danger">Umm sorry.</ion-text>

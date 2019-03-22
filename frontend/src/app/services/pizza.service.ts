@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ToppingsService} from './contract/toppings.service';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, pipe} from 'rxjs';
 import {Topping} from './contract/models/topping';
 import {exhaustMap, shareReplay, tap} from 'rxjs/operators';
 import {CreateToppingBody} from './contract/models/request';
@@ -21,8 +21,14 @@ export class PizzaService {
     );
   }
 
-  createTopping({topping}: { topping: CreateToppingBody }) {
-    return this.toppingsService.createTopping({body: topping}).pipe(
+  createTopping({topping}: { topping: CreateToppingBody }): Observable<Topping> {
+    return this.toppingsService.createTopping(topping).pipe(
+      tap(() => this._refreshToppings.next(true))
+    );
+  }
+
+  removeTopping({topping}: { topping: Topping }): Observable<void> {
+    return this.toppingsService.removeTopping(topping.id).pipe(
       tap(() => this._refreshToppings.next(true))
     );
   }
