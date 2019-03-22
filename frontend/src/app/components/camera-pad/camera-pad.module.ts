@@ -1,10 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {CameraPadComponent} from './camera-pad.component';
+import {IonicModule} from '@ionic/angular';
 
 @NgModule({
-  declarations: [],
+  declarations: [CameraPadComponent],
   imports: [
-    CommonModule
-  ]
+    CommonModule,
+    IonicModule
+  ],
+  exports: [CameraPadComponent]
 })
-export class CameraPadModule { }
+export class CameraPadModule {
+}

@@ -5,10 +5,10 @@
     <span class="grey"></span>
 
     <div class="mid-buttons">
-      <span class="select" (mousedown)="pushButton('select')"> </span>
+      <span class="select" (mousedown)="pushButton('select')" (touchstart)="pushButton('select')"> </span>
       <audio #selectAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
 
-      <span class="start" (mousedown)="pushButton('start')"> </span>
+      <span class="start" (mousedown)="pushButton('start')" (touchstart)="pushButton('start')"> </span>
       <audio #startAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
     </div>
 
@@ -16,23 +16,23 @@
       <span class="plus"></span>
       <span class="plus2"></span>
 
-      <span class="thumb1" (mousedown)="pushButton('left')"></span>
+      <span class="thumb1" (mousedown)="pushButton('left')" (touchstart)="pushButton('left')"></span>
       <audio #leftAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
 
-      <span class="thumb2" (mousedown)="pushButton('up')"></span>
+      <span class="thumb2" (mousedown)="pushButton('up')" (touchstart)="pushButton('up')"></span>
       <audio #upAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
 
-      <span class="thumb3" (mousedown)="pushButton('right')"></span>
+      <span class="thumb3" (mousedown)="pushButton('right')" (touchstart)="pushButton('right')"></span>
       <audio #rightAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
 
-      <span class="thumb4" (mousedown)="pushButton('down')"></span>
+      <span class="thumb4" (mousedown)="pushButton('down')" (touchstart)="pushButton('down')"></span>
       <audio #downAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
     </div>
 
-    <span class="b" (mousedown)="pushButton('b')"></span>
+    <span class="b" (mousedown)="pushButton('b')" (touchstart)="pushButton('b')"></span>
     <audio #bAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
 
-    <span class="a" (mousedown)="pushButton('a')"></span>
+    <span class="a" (mousedown)="pushButton('a')" (touchstart)="pushButton('a')"></span>
     <audio #aAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
   </div>
 </div>
