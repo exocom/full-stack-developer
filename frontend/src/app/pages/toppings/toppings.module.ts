@@ -5,6 +5,7 @@ import {Routes, RouterModule} from '@angular/router';
 import {IonicModule} from '@ionic/angular';
 import {ToppingsPage} from './toppings.page';
 import {CloudMessageModule} from '../../components/cloud-message/cloud-message.module';
+import {ToppingModalModule} from '../../modals/topping/topping-modal.module';
 
 const routes: Routes = [
   {
@@ -19,6 +20,7 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     CloudMessageModule,
+    ToppingModalModule,
     RouterModule.forChild(routes)
   ],
   declarations: [ToppingsPage]
