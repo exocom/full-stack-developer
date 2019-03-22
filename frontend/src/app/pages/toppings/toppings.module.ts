@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { ToppingsPage } from './toppings.page';
 import {CloudMessageModule} from '../../components/cloud-message/cloud-message.module';
+import {NesControllerModule} from '../../components/nes-controller/nes-controller.module';
 
 const routes: Routes = [
   {
@@ -21,6 +22,7 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     CloudMessageModule,
+    NesControllerModule,
     RouterModule.forChild(routes)
   ],
   declarations: [ToppingsPage]
