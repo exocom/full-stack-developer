@@ -1,6 +1,16 @@
 @import url('https://fonts.googleapis.com/css?family=Coda+Caption:800');
 @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
 
+.wire {
+  width: calc(100vw * 0.03);
+  height: calc(100vw * 0.192);
+  position: absolute;
+  background: linear-gradient(to right, black 0%, #45484d 38%, black 100%);
+  top: 0;
+  left: calc(100vw * 0.46);
+  z-index: 0;
+}
+
 .controller {
   width: 100vw;
   height: calc(100vw * 0.44);
@@ -29,7 +39,7 @@ h1 {
   font-family: 'Coda Caption', sans-serif;
   font-size: calc(100vw * 0.032);
   color: red;
-  letter-spacing: -(calc(100vw * 0.002));
+  letter-spacing: calc(100vw * -0.002);
   position: relative;
   top: calc(100vw * 0.08);
   left: calc(100vw * 0.68);
@@ -82,7 +92,7 @@ h1 {
   height: calc(100vw * 0.05);
   border-radius: 0 0 calc(100vw * 0.008) calc(100vw * 0.008);
   position: relative;
-  top: -32px;
+  top: calc(100vw * -0.064);
   padding-top: calc(100vw * 0.014);
   box-shadow: inset 0 calc(100vw * 0.002) calc(100vw * 0.004) #777;
 }
@@ -98,7 +108,7 @@ h1 {
   top: calc(100vw * 0.144);
   left: calc(100vw * 0.32);
   border: calc(100vw * 0.006) solid #ccc;
-  box-shadow: inset -(calc(100vw * 0.004)) calc(100vw * 0.004) calc(100vw * 0.014) #888;
+  box-shadow: inset calc(100vw * -0.004) calc(100vw * 0.004) calc(100vw * 0.014) #888;
 }
 
 .select {
@@ -110,7 +120,7 @@ h1 {
   background: #111;
   top: calc(100vw * 0.032);
   left: calc(100vw * 0.04);
-  box-shadow: inset -(calc(100vw * 0.002)) calc(100vw * 0.002) calc(100vw * 0.004) #ccc, 0 0 calc(100vw * 0.01) #111;;
+  box-shadow: inset calc(100vw * -0.002) calc(100vw * 0.002) calc(100vw * 0.004) #ccc, 0 0 calc(100vw * 0.01) #111;
 }
 
 .start {
@@ -122,7 +132,7 @@ h1 {
   background: #111;
   top: calc(100vw * 0.002);
   left: calc(100vw * 0.154);
-  box-shadow: inset -(calc(100vw * 0.002)) calc(100vw * 0.002) calc(100vw * 0.004) #ccc, 0 0 calc(100vw * 0.01) #111;;
+  box-shadow: inset calc(100vw * -0.002) calc(100vw * 0.002) calc(100vw * 0.004) #ccc, 0 0 calc(100vw * 0.01) #111;
 }
 
 .mid-buttons:after {
@@ -135,14 +145,14 @@ h1 {
   height: calc(100vw * 0.046);
   border-radius: calc(100vw * 0.008) calc(100vw * 0.008) 0 0;
   position: relative;
-  top: 27px;
-  left: -(calc(100vw * 0.004));
+  top: calc(100vw * 0.054);
+  left: calc(100vw * -0.004);
 }
 
 .dpad {
   position: absolute;
   top: calc(100vw * 0.1);
-  left: 27px;
+  left: calc(100vw * 0.054);
 }
 
 .plus {
@@ -158,37 +168,36 @@ h1 {
 .plus:before {
   display: block;
   background: #ccc;
-  content: "";
+  content: '';
   width: calc(100vw * 0.22);
   height: calc(100vw * 0.084);
   position: absolute;
   top: calc(100vw * 0.068);
-  left: -36px;
+  left: calc(100vw * -0.072);
   border-radius: calc(100vw * 0.006);
 }
 
 .plus2 {
   display: block;
   background: #171717;
-  width: 32px;
-  height: 99px;
+  width: calc(100vw * 0.064);
+  height: calc(100vw * 0.198);
   position: relative;
   margin-left: calc(100vw * 0.066);
   border-radius: calc(100vw * 0.006);
-  top: -103px;
+  top: calc(100vw * -0.206);
   left: calc(100vw * 0.008);
-
 }
 
 .plus2:before {
   display: block;
   background: #171717;
-  content: "";
-  width: 99px;
-  height: 32px;
+  content: '';
+  width: calc(100vw * 0.198);
+  height: calc(100vw * 0.064);
   position: absolute;
-  top: 32px;
-  left: -34px;
+  top: calc(100vw * 0.064);
+  left: calc(100vw * -0.068);
   border-radius: calc(100vw * 0.006);
 }
 
@@ -196,10 +205,10 @@ h1 {
   width: calc(100vw * 0.04);
   height: calc(100vw * 0.04);
   display: block;
-  border-radius: 100px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, .5) 0%, rgba(255, 255, 255, 0) 50%);
+  border-radius: calc(100vw * 0.2);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%);
   position: relative;
-  top: -163px;
+  top: calc(100vw * -0.326);
   left: calc(100vw * 0.02);
 }
 
@@ -207,33 +216,33 @@ h1 {
   width: calc(100vw * 0.04);
   height: calc(100vw * 0.04);
   display: block;
-  border-radius: 100px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, .5) 0%, rgba(255, 255, 255, 0) 50%);
+  border-radius: calc(100vw * 0.2);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%);
   position: relative;
-  top: -218px;
-  left: 43px;
+  top: calc(100vw * -0.436);
+  left: calc(100vw * 0.086);
 }
 
 .thumb3 {
   width: calc(100vw * 0.04);
   height: calc(100vw * 0.04);
   display: block;
-  border-radius: 100px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, .5) 0%, rgba(255, 255, 255, 0) 50%);
+  border-radius: calc(100vw * 0.2);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%);
   position: absolute;
-  top: 45px;
-  left: 76px;
+  top: calc(100vw * 0.09);
+  left: calc(100vw * 0.152);
 }
 
 .thumb4 {
   width: calc(100vw * 0.04);
   height: calc(100vw * 0.04);
   display: block;
-  border-radius: 100px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, .5) 0%, rgba(255, 255, 255, 0) 50%);
+  border-radius: calc(100vw * 0.2);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%);
   position: relative;
-  top: -168px;
-  left: 44px;
+  top: calc(100vw * -0.336);
+  left: calc(100vw * 0.088);
 }
 
 .b {
@@ -243,8 +252,8 @@ h1 {
   height: calc(100vw * 0.1);
   border-radius: calc(100vw * 0.006);
   background: #ccc;
-  top: 103px;
-  left: 330px;
+  top: calc(100vw * 0.206);
+  left: calc(100vw * 0.66);
   box-shadow: inset 0 0 calc(100vw * 0.002) #fff, 0 0 calc(100vw * 0.002) #000;
   text-decoration: none;
 }
@@ -254,12 +263,12 @@ h1 {
   display: block;
   width: calc(100vw * 0.072);
   height: calc(100vw * 0.072);
-  border-radius: 100px;
+  border-radius: calc(100vw * 0.2);
   background: red;
   position: relative;
   top: calc(100vw * 0.014);
   left: calc(100vw * 0.014);
-  box-shadow: inset -(calc(100vw * 0.002)) calc(100vw * 0.004) calc(100vw * 0.008) #ccc, 0 0 calc(100vw * 0.004) calc(100vw * 0.002) #111;
+  box-shadow: inset calc(100vw * -0.002) calc(100vw * 0.004) calc(100vw * 0.008) #ccc, 0 0 calc(100vw * 0.004) calc(100vw * 0.002) #111;
   box-sizing: border-box;
   border: calc(100vw * 0.002) solid red;
 }
@@ -281,8 +290,8 @@ h1 {
   height: calc(100vw * 0.1);
   border-radius: calc(100vw * 0.006);
   background: #ccc;
-  top: 103px;
-  left: 395px;
+  top: calc(100vw * 0.206);
+  left: calc(100vw * 0.79);
   box-shadow: inset 0 0 calc(100vw * 0.002) #fff, 0 0 calc(100vw * 0.002) #000;
   text-decoration: none;
 }
@@ -292,12 +301,12 @@ h1 {
   display: block;
   width: calc(100vw * 0.072);
   height: calc(100vw * 0.072);
-  border-radius: 100px;
+  border-radius: calc(100vw * 0.2);
   background: red;
   position: relative;
   top: calc(100vw * 0.014);
   left: calc(100vw * 0.014);
-  box-shadow: inset -(calc(100vw * 0.002)) calc(100vw * 0.004) calc(100vw * 0.008) #ccc, 0 0 calc(100vw * 0.004) calc(100vw * 0.002) #111;
+  box-shadow: inset calc(100vw * -0.002) calc(100vw * 0.004) calc(100vw * 0.008) #ccc, 0 0 calc(100vw * 0.004) calc(100vw * 0.002) #111;
   box-sizing: border-box;
   border: calc(100vw * 0.002) solid red;
 }
@@ -311,5 +320,3 @@ h1 {
   text-decoration: none;
   left: calc(100vw * 0.08);
 }
-
-
