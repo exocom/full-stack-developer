@@ -13,7 +13,6 @@
 </ion-header>
 
 <ion-content>
-  <app-nes-controller></app-nes-controller>
   <ng-container *ngIf="toppingsGroupByType$ | async as toppingsByType; else noToppings">
     <ion-list lines="none">
       <ng-container *ngFor="let toppingGroup of toppingsByType">

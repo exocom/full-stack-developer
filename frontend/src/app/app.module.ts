@@ -10,11 +10,18 @@ import {IonicStorageModule} from '@ionic/storage';
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
 import {HttpClientModule} from '@angular/common/http';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, HttpClientModule, IonicModule.forRoot({mode: 'ios'}), AppRoutingModule, IonicStorageModule.forRoot()],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    IonicModule.forRoot({mode: 'ios'}),
+    AppRoutingModule, IonicStorageModule.forRoot()
+  ],
   providers: [
     StatusBar,
     SplashScreen,

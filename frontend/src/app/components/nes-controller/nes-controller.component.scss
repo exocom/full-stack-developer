@@ -145,7 +145,7 @@ h1 {
   height: calc(100vw * 0.046);
   border-radius: calc(100vw * 0.008) calc(100vw * 0.008) 0 0;
   position: relative;
-  top: calc(100vw * 0.054);
+  top: calc(100vw * 0.051);
   left: calc(100vw * -0.004);
 }
 
@@ -276,6 +276,8 @@ h1 {
 .b:after {
   content: 'B';
   font-family: 'Nunito', sans-serif;
+  font-weight: bold;
+  font-size: calc(100vw * 0.026);
   color: red;
   position: relative;
   top: calc(100vw * 0.03);
@@ -314,6 +316,8 @@ h1 {
 .a:after {
   content: 'A';
   font-family: 'Nunito', sans-serif;
+  font-weight: bold;
+  font-size: calc(100vw * 0.026);
   color: red;
   position: relative;
   top: calc(100vw * 0.03);

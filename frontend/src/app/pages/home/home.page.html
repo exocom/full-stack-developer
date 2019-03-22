@@ -1,35 +1,36 @@
 <ion-header>
-    <ion-toolbar color="primary">
-        <ion-buttons slot="start">
-            <ion-menu-button></ion-menu-button>
-        </ion-buttons>
-    </ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content forceOverscroll="false">
-    <img src="/assets/pizza-on-cut-board.jpg" class="bg"/>
+  <img src="/assets/pizza-on-cut-board.jpg" class="bg"/>
 
-    <div class="ion-padding" flex-row style="height: 100%">
-        <h2 flex align-items-center justify-content-center>
-            <ion-img src="/assets/logo.png" class="logo"></ion-img>
-            <ion-text>Tasty Pie</ion-text>
-        </h2>
-        <div flex align-items-center justify-content-center style="flex-grow: 1">
-            <h1>
-                Real. Healthy.
-                <br/>
-                Authentic.
-            </h1>
-        </div>
-
-        <div class="ion-padding">
-            <ion-button size="full" routerLink="/toppings">Toppings</ion-button>
-            <ion-button size="full" routerLink="/pizzas">Pizza Pies</ion-button>
-        </div>
-        <ion-text class="ion-text-center">
-            &copy; 2020
-        </ion-text>
+  <div class="ion-padding" flex-row style="height: 100%">
+    <h2 flex align-items-center justify-content-center>
+      <ion-img src="/assets/logo.png" class="logo"></ion-img>
+      <ion-text>Tasty Pie</ion-text>
+    </h2>
+    <div flex align-items-center justify-content-center style="flex-grow: 1">
+      <h1>
+        Real. Healthy.
+        <br/>
+        Authentic.
+      </h1>
     </div>
+
+    <div class="ion-padding ion-text-right">
+      <ion-button size="full" routerLink="/toppings">Toppings</ion-button>
+      <ion-button size="full" routerLink="/pizzas">Pizza Pies</ion-button>
+      <ion-text color="danger" (click)="openBottomSheet()">Promo Code?</ion-text>
+    </div>
+    <ion-text class="ion-text-center">
+      &copy; 2020
+    </ion-text>
+  </div>
 
 
 </ion-content>

@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {PizzaService} from '../../services/pizza.service';
 import {map, tap} from 'rxjs/operators';
 import {Topping, ToppingType} from '../../services/contract/models/topping';
+import {MatBottomSheet} from '@angular/material';
+import {NesControllerBottomSheetComponent} from '../../bottom-sheets/nes-controller/nes-controller-bottom-sheet.component';
 
 @Component({
   selector: 'app-toppings',
