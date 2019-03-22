@@ -94,9 +94,12 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const {toppingId} = plainToClass(DeleteToppingPathParameters, event.pathParameters);
-  const {deletedCount} = await toppingCollection.deleteOne({_id: toppingId});
-
-  return apiGatewayUtil.sendJson({statusCode: deletedCount === 0 ? 404 : 204});
+  const {value} = await toppingCollection.findOneAndDelete({_id: toppingId}, {projection: {image: 1}});
+  if (value) {
+    const {image} = value;
+    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key}).promise();
+  }
+  return apiGatewayUtil.sendJson({statusCode: value ? 204 : 404});
 };
 
 export const updateTopping: ApiGatewayHandler = async (event) => {

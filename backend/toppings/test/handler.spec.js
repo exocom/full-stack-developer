@@ -54,6 +54,7 @@ describe('toppings', () => {
   beforeEach(async () => {
     await mongoUnit.initDb(process.env.MONGO_URI, testData);
     awsMock.mock('S3', 'putObject', {ETag: '4166c51556fff0f1354b2f5704b1c297'});
+    awsMock.mock('S3', 'deleteObject', {});
   });
 
   after(async () => {
