@@ -26,8 +26,10 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
   };
 };
 
+const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+
 export const createTopping: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const body = deserialize(CreateToppingBody, event.body);
@@ -80,7 +82,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 };
 
 export const getToppings: ApiGatewayHandler = async () => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const mongoToppings = await toppingCollection.find({}).toArray();
@@ -88,7 +90,7 @@ export const getToppings: ApiGatewayHandler = async () => {
 };
 
 export const deleteTopping: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const {toppingId} = plainToClass(DeleteToppingPathParameters, event.pathParameters);
@@ -98,7 +100,7 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
 };
 
 export const updateTopping: ApiGatewayHandler = async (event) => {
-  const client = await MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+  const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const {toppingId} = plainToClass(UpdateToppingPathParameters, event.pathParameters);

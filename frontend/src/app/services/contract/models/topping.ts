@@ -1,11 +1,11 @@
 import {ObjectId} from 'bson';
 
 export enum ToppingType {
-  Cheese = 'cheese',
   Sauce = 'sauce',
+  Cheese = 'cheese',
+  Meat = 'meat',
   Vegetable = 'vegetable',
   Fruit = 'fruit',
-  Meat = 'meat',
   Seasoning = 'seasoning'
 }
 

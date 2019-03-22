@@ -7,20 +7,34 @@
       <ion-img src="/assets/logo.png" class="logo"></ion-img>
       Tasty Pie
     </ion-title>
+    <ion-icon slot="end" name="md-apps" size="medium"></ion-icon>
+    <ion-icon slot="end" name="list" size="large"></ion-icon>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ng-container *ngIf="toppings$ | async as toppings; else noToppings">
-    You got toppings
-    <pre>{{toppings|json}}</pre>
+  <ng-container *ngIf="toppingsGroupByType$ | async as toppingsByType; else noToppings">
+
+    <ion-list>
+      <ng-container *ngFor="let toppingGroup of toppingsByType">
+        <ion-list-header><ion-text color="primary">{{toppingGroup.type}}</ion-text></ion-list-header>
+        <ion-item *ngFor="let topping of toppingGroup.toppings">
+          <ion-avatar slot="start">
+            <ion-img [src]="topping.image.url"></ion-img>
+          </ion-avatar>
+          <ion-label>{{topping.name}}</ion-label>
+        </ion-item>
+      </ng-container>
+    </ion-list>
   </ng-container>
 
   <ng-template #noToppings>
     <ion-progress-bar *ngIf="loading.toppings" color="tertiary"></ion-progress-bar>
     <ng-container *ngIf="!loading.toppings">
       <app-cloud-message type="crumbs" class="fill">
-        <h1 no-margin><ion-text color="danger">Umm sorry.</ion-text></h1>
+        <h1 no-margin>
+          <ion-text color="danger">Umm sorry.</ion-text>
+        </h1>
         <p no-margin>Looks like you don't have any ingredients</p>
         <!--<ion-note margin-top>Hint: Then try again to see if the camera activates.</ion-note>-->
       </app-cloud-message>
