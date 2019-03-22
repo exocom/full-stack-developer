@@ -28,4 +28,11 @@ export class ToppingsPage implements OnInit {
   ngOnInit() {
   }
 
+  removeTopping() {
+
+  }
+
+  createTopping() {
+
+  }
 }
