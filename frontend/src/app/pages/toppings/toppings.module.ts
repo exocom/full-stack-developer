@@ -4,8 +4,8 @@ import {FormsModule} from '@angular/forms';
 import {Routes, RouterModule} from '@angular/router';
 import {IonicModule} from '@ionic/angular';
 import {ToppingsPage} from './toppings.page';
-import {CloudMessageModule} from '../../components/cloud-message/cloud-message.module';
 import {ToppingModalModule} from '../../modals/topping/topping-modal.module';
+import {PizzaMessageModule} from '../../components/pizza-message/pizza-message.module';
 
 const routes: Routes = [
   {
@@ -19,7 +19,7 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    CloudMessageModule,
+    PizzaMessageModule,
     ToppingModalModule,
     RouterModule.forChild(routes)
   ],

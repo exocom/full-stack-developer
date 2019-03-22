@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-pizzas',
   templateUrl: './pizzas.page.html',
-  styleUrls: ['./pizzas.page.scss'],
+  styleUrls: ['./pizzas.page.scss']
 })
 export class PizzasPage implements OnInit {
+  loading = {pizzas: false};
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
