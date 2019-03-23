@@ -4,10 +4,11 @@ import {ModalController, NavParams, ToastController} from '@ionic/angular';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {PizzaStoreService} from '../../services/pizza-store.service';
 import {getMIMEType} from 'mim';
-import {ImageMimeTypes} from '../../models/images';
+import {ImageMimeTypes, ImageUpload} from '../../models/images';
 import {switchMap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
 import {randomString} from '../../common/string';
+import {debug} from 'util';
 
 type Loading = { toppingValidation: boolean; toppingImage: boolean; toppingUpdate: boolean; };
 
@@ -38,7 +39,7 @@ export class ToppingModalComponent implements OnInit {
   dataUrlFormControl = this.imageFormGroup.get('dataUrl') as FormControl;
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
-  toppingDataUrl: string;
+  toppingDataUrl: string | ArrayBuffer;
 
   constructor(private fb: FormBuilder,
               private modalController: ModalController,
@@ -57,7 +58,7 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  private async uploadImage({filename, contentType}, {file, base64data}: { file?: File; base64data?: string; }) {
+  private async uploadImage({filename, contentType}, {file, base64str}: ImageUpload) {
     this.loading.toppingImage = true;
     if (!Object.values(ImageMimeTypes).includes(contentType)) {
       const toast = await this.toastCtrl.create({
@@ -73,10 +74,13 @@ export class ToppingModalComponent implements OnInit {
 
     this.pizzaStoreService.createToppingImageSignedUrl({filename: file.name, mimeType: file.name})
       .pipe(
-        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, contentType}, {file, base64data})),
+        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, contentType}, {file, base64str: base64str})),
         switchMap((url) => {
+          console.log(url);
+          debugger;
           // TODO : get url from aws payload?
-          this.toppingFormGroup.patchValue({image: {filename, url}});
+          return url;
+          // this.toppingFormGroup.patchValue({image: {filename, url}});
         })
         /*
         .subscribe((toppingBase) => {
@@ -94,9 +98,6 @@ export class ToppingModalComponent implements OnInit {
   await toast.present();
   this.loading.toppingValidation = false;
 });
-
-
-
          */
         // })
       )
@@ -113,23 +114,25 @@ export class ToppingModalComponent implements OnInit {
         await toast.present();
         this.loading.toppingImage = false;
       });
-
-    return this.pizzaStoreService.detectTopping({filename});
   }
 
   processFile(file: File) {
-    // TODO : Preview image?
     this.loading.toppingImage = true;
-    const mimeType = getMIMEType(file.name);
-    return this.uploadImage({filename: file.name, contentType: mimeType}, {file});
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      this.toppingDataUrl = fileReader.result;
+    };
+    fileReader.readAsDataURL(file);
+    const contentType = getMIMEType(file.name);
+    return this.uploadImage({filename: file.name, contentType}, {file});
   }
 
   processPhoto(dataUrl: string) {
+    this.loading.toppingImage = true;
     this.toppingDataUrl = dataUrl;
-    const [match, contentType, ext, base64data] = dataUrl.match(dataUrlRegExp);
+    const [match, contentType, ext, base64str] = dataUrl.match(dataUrlRegExp);
     const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
-    return this.uploadImage({filename, contentType}, {base64data});
-
+    return this.uploadImage({filename, contentType}, {base64str});
   }
 
   async save() {

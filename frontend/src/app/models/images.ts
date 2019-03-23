@@ -8,5 +8,5 @@ export enum ImageMimeTypes {
 
 export interface ImageUpload {
   file?: File;
-  base64?: string;
+  base64str?: string;
 }

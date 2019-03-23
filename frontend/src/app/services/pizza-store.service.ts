@@ -7,6 +7,7 @@ import {CreatePizzaBody, CreateToppingBody, UpdateToppingBody} from './contract/
 import {Pizza} from './contract/models/pizza';
 import {PizzasService} from './contract/pizzas.service';
 import {S3Service} from './contract/s3.service';
+import {ImageUpload} from '../models/images';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +23,8 @@ export class PizzaStoreService {
     return this.toppingsService.createToppingImageSignedUrl({filename, mimeType});
   }
 
-  uploadToppingImage({signedUrl, contentType}, {file, base64data}) {
-    return this.s3Service.uploadToSignedUrl(signedUrl, contentType, {file, base64data});
+  uploadToppingImage({signedUrl, contentType}, {file, base64str}: ImageUpload) {
+    return this.s3Service.uploadToSignedUrl(signedUrl, contentType, {file, base64str: base64str});
   }
 
   getToppings(): Observable<Array<Topping>> {

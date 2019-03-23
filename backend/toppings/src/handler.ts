@@ -90,8 +90,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
   }
 
-  const matches = image.dataUrl.match(dataUrlRegExp);
-  const [dataUrl, contentType, ext, base64data] = matches;
+  const [match, contentType, ext, base64data] = image.dataUrl.match(dataUrlRegExp);
   try {
     await s3.putObject({
       Bucket: TOPPINGS_S3_BUCKET,
@@ -164,8 +163,7 @@ export const updateTopping: ApiGatewayHandler = async (event) => {
   }
 
   const {name, type, image} = body;
-  const matches = image.dataUrl.match(dataUrlRegExp);
-  const [dataUrl, contentType, ext, base64data] = matches;
+  const [match, contentType, ext, base64data] = image.dataUrl.match(dataUrlRegExp);
   try {
     await s3.putObject({
       Bucket: TOPPINGS_S3_BUCKET,
@@ -207,9 +205,7 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
   }
 
   const {dataUrl} = body;
-  const matches = dataUrl.match(dataUrlRegExp);
-  const [all, contentType, ext, base64data] = matches;
-
+  const [match, contentType, ext, base64data] = dataUrl.match(dataUrlRegExp);
   try {
     const result = await rekognition.detectLabels({
       Image: {Bytes: Buffer.from(base64data, 'base64')}, MinConfidence: 65, MaxLabels: 15
