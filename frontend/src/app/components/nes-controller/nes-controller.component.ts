@@ -70,9 +70,21 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
       {key: 'B', ref: this.bAudio}
     ];
 
+    // @ts-ignore
+    const isWebkitAudioContext = !!window.webkitAudioContext;
+    // @ts-ignore
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) {
+      return;
+    }
+    const singletonAudioContext = new AC();
+
     this.audioMap = audioElements.reduce((obj, {key, ref}, i) => {
       const audioElement = ref.nativeElement;
-      const audioContext = new AudioContext();
+      if (!audioElement) {
+        return;
+      }
+      const audioContext = isWebkitAudioContext ? singletonAudioContext : new AC();
       const track = audioContext.createMediaElementSource(audioElement);
       track.connect(audioContext.destination);
 
@@ -83,6 +95,7 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
       };
       return obj;
     }, this.audioMap);
+
   }
 
   ngOnDestroy(): void {
@@ -101,6 +114,9 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.buttonPressed.emit(button);
+    if (this.audioMap[button] === null) {
+      return;
+    }
     const {audioElement, audioContext} = this.audioMap[button];
     if (audioContext.state === 'suspended') {
       await audioContext.resume();
