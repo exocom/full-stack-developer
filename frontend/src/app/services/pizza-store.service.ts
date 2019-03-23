@@ -37,7 +37,7 @@ export class PizzaStoreService {
   }
 
   detectTopping({dataUrl}): Observable<ToppingBase> {
-    return this.toppingsService.detectTopping({dataUrl});
+    return this.toppingsService.detectTopping(dataUrl);
   }
 
   getPizzas(): Observable<Array<Pizza>> {

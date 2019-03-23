@@ -30,7 +30,7 @@
       <ion-label position="stacked">Type</ion-label>
       <ion-select formControlName="type" placeholder="Choose..." required>
         <ion-select-option *ngFor="let key of objectKeys(toppingTypes)"
-                           [value]="key">{{toppingTypes[key]}}</ion-select-option>
+                           [value]="toppingTypes[key]">{{key}}</ion-select-option>
       </ion-select>
     </ion-item>
 
