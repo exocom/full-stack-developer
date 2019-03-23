@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {PizzaStoreService} from '../../services/pizza-store.service';
-import {map, take} from 'rxjs/operators';
-import {Topping, ToppingType} from '../../services/contract/models/topping';
+import {map} from 'rxjs/operators';
+import {Defaults, Topping, ToppingType} from '../../services/contract/models/topping';
 import {AlertController, ModalController, ToastController} from '@ionic/angular';
 import {ToppingModalComponent} from '../../modals/topping/topping-modal.component';
 
@@ -12,7 +12,6 @@ import {ToppingModalComponent} from '../../modals/topping/topping-modal.componen
 })
 export class ToppingsPage implements OnInit {
   toppings$ = this.pizzaStoreService.getToppings();
-
   toppingsGroupByType$ = this.toppings$.pipe(
     map((toppings) => {
       return Object.values(ToppingType).map((toppingType): { type: ToppingType, toppings: Array<Topping> } => {
@@ -31,6 +30,7 @@ export class ToppingsPage implements OnInit {
   }
 
   ngOnInit() {
+    setTimeout(() => this.createTopping(), 200);
   }
 
   async removeTopping(topping: Topping) {
@@ -62,7 +62,7 @@ export class ToppingsPage implements OnInit {
   }
 
   createTopping() {
-    this.showModal({topping: null});
+    this.showModal({topping: Defaults.topping});
   }
 
   editTopping(topping: Topping) {

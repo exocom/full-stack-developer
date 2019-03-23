@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ToppingsService} from './contract/toppings.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Topping} from './contract/models/topping';
+import {Topping, ToppingBase} from './contract/models/topping';
 import {exhaustMap, shareReplay, tap} from 'rxjs/operators';
 import {CreatePizzaBody, CreateToppingBody} from './contract/models/request';
 import {Pizza} from './contract/models/pizza';
@@ -34,6 +34,10 @@ export class PizzaStoreService {
     return this.toppingsService.removeTopping(topping.id).pipe(
       tap(() => this._refreshToppings.next(true))
     );
+  }
+
+  detectTopping({dataUrl}): Observable<ToppingBase> {
+    return this.toppingsService.detectTopping({dataUrl});
   }
 
   getPizzas(): Observable<Array<Pizza>> {

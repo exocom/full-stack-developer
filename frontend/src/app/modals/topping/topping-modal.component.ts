@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Topping} from '../../services/contract/models/topping';
-import {ModalController, NavParams} from '@ionic/angular';
+import {Defaults, Topping, ToppingType} from '../../services/contract/models/topping';
+import {ModalController, NavParams, ToastController} from '@ionic/angular';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import {PizzaStoreService} from '../../services/pizza-store.service';
 
 @Component({
   selector: 'app-topping',
@@ -10,7 +12,29 @@ import {ModalController, NavParams} from '@ionic/angular';
 export class ToppingModalComponent implements OnInit {
   @Input() topping: Topping;
 
-  constructor(private modalController: ModalController, navParams: NavParams) {
+  loading: { toppingValidation: boolean; } = {toppingValidation: false};
+
+  objectKeys = Object.keys;
+  toppingTypes = ToppingType;
+
+  imageFormGroup = this.fb.group({
+    dataUrl: [Defaults.topping.image.url, Validators.required]
+  });
+  toppingFormGroup = this.fb.group({
+    image: this.imageFormGroup,
+    name: [Defaults.topping.name, Validators.required],
+    type: [Defaults.topping.type, Validators.required]
+  });
+
+  dataUrlFormControl = this.imageFormGroup.get('dataUrl') as FormControl;
+
+  toppingDataUrl: string;
+
+  constructor(private fb: FormBuilder,
+              private modalController: ModalController,
+              navParams: NavParams,
+              private pizzaStoreService: PizzaStoreService,
+              public toastCtrl: ToastController) {
   }
 
   ngOnInit() {
@@ -21,7 +45,24 @@ export class ToppingModalComponent implements OnInit {
   }
 
   processPhoto(dataUrl: string) {
-    console.log('Got Photo', !!dataUrl);
+    this.toppingDataUrl = dataUrl;
+    this.loading.toppingValidation = true;
+    this.pizzaStoreService.detectTopping({dataUrl}).subscribe((toppingBase) => {
+      const {name, type} = toppingBase;
+      this.toppingFormGroup.setValue({name, type, image: {dataUrl}});
+
+      this.loading.toppingValidation = false;
+      this.toppingDataUrl = null;
+    }, async (res) => {
+      const toast = await this.toastCtrl.create({
+        color: 'danger',
+        message: 'That is not food! Please take another photo.',
+        showCloseButton: true
+      });
+      await toast.present();
+      this.loading.toppingValidation = false;
+      this.toppingDataUrl = null;
+    });
   }
 
   save() {

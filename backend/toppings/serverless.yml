@@ -64,14 +64,20 @@ functions:
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: PUT toppings/{toppingId}
+      - http:
+        method: PUT
+        path: toppings/{toppingId}
+        cors: true
 
   detectTopping:
     handler: src/handler.detectTopping
     layers:
       - ${self:custom.layers.node-modules}
     events:
-      - http: POST detect-topping
+      - http:
+        method: POST
+        path: detect-topping
+        cors: true
 
 custom:
   localDevPort: 5000

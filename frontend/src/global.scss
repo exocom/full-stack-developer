@@ -54,3 +54,42 @@ ion-list-header, ion-badge {
   padding: 0;
   overflow: hidden;
 }
+
+.scanning:after {
+  content: '';
+  /* make the element cover the whole thing */
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* and sit in front */
+  z-index: 1;
+  /* gradient with a radar like fade */
+  /* make it big enough so when we slide it around still covers whole image */
+  background-size: 300% 100%;
+  /* start with the scan bar just off the left side */
+  background: linear-gradient(90deg,
+          rgba(0, 0, 0, 1),
+          rgba(0, 0, 0, 1) 50%,
+          rgba(var(--ion-color-tertiary-rgb), .5) 55%,
+          rgba(var(--ion-color-tertiary-rgb), 1) 56%,
+          rgba(0, 0, 0, 1) 56%,
+          rgba(0, 0, 0, 1)
+  );
+  /* make it big enough so when we slide it around still covers whole image */
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  /* start with the scan bar just off the left side */
+  background-position: 84% center;
+
+  animation: scan 5s infinite ease;
+}
+
+@keyframes scan {
+  /* finish with the scan bar just off the right side */
+  100% {
+    background-position: 25% center;
+  }
+}

@@ -8,13 +8,38 @@
 </ion-header>
 
 <ion-content scrollY="false">
-  <!--TODO ngIf no photo-->
-  <app-camera-pad (photoCaptured)="processPhoto($event)"></app-camera-pad>
+  <form [formGroup]="toppingFormGroup">
+    <!--TODO ngIf no photo-->
+    <div formGroupName="image">
+      <ion-img *ngIf="dataUrlFormControl.value else noImage" [src]="dataUrlFormControl.value"></ion-img>
 
-  <!--TODO ngIf photo w/ processing-->
+      <ng-template #noImage>
+        <app-camera-pad *ngIf="!toppingDataUrl" (photoCaptured)="processPhoto($event)"></app-camera-pad>
+        <ion-img *ngIf="toppingDataUrl" [src]="toppingDataUrl"
+                 [class.scanning]="loading.toppingValidation"></ion-img>
+      </ng-template>
+      <ion-input type="hidden" formControlName="dataUrl"></ion-input>
+    </div>
 
-  <!--TODO ngIf valid photo (processed)-->
-  <form>
+    <ion-item>
+      <ion-label position="stacked">Name</ion-label>
+      <ion-input formControlName="name" placeholder="e.g. Pineapple" clearInput required></ion-input>
+    </ion-item>
 
+    <ion-item>
+      <ion-label position="stacked">Type</ion-label>
+      <ion-select formControlName="type" placeholder="Choose..." required>
+        <ion-select-option *ngFor="let key of objectKeys(toppingTypes)"
+                           [value]="key">{{toppingTypes[key]}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!--<div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.username">
+        <div class="error-message" *ngIf="validations_form.get('username').hasError(validation.type) && (validations_form.get('username').dirty || validations_form.get('username').touched)">
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>-->
   </form>
 </ion-content>

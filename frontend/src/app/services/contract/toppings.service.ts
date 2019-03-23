@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponse} from './models/api';
 import {map} from 'rxjs/operators';
-import {Topping} from './models/topping';
+import {Topping, ToppingBase} from './models/topping';
 import {plainToClass} from 'class-transformer';
 import {CreateToppingBody} from './models/request';
 
@@ -32,5 +32,10 @@ export class ToppingsService {
 
   removeTopping(toppingId): Observable<void> {
     return this.http.delete<void>(`${this.url}/toppings/${toppingId}`, this.httpOptions);
+  }
+
+  detectTopping(dataUrl): Observable<ToppingBase> {
+    return this.http.post<ApiResponse<ToppingBase>>(`${this.url}/detect-topping`, {dataUrl}, this.httpOptions)
+      .pipe(map(body => plainToClass(ToppingBase, body.data)));
   }
 }

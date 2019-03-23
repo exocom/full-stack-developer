@@ -9,11 +9,25 @@ export enum ToppingType {
   Seasoning = 'seasoning'
 }
 
-export class Topping {
-  id: string;
+export class ToppingBase {
   name: string;
-  type: ToppingType;
+  type?: ToppingType;
+}
+
+export class Topping extends ToppingBase {
+  id: string;
   image: {
     url: string;
+  };
+}
+
+export class Defaults {
+  static topping: Topping = {
+    id: null,
+    name: null,
+    type: null,
+    image: {
+      url: null
+    }
   };
 }
