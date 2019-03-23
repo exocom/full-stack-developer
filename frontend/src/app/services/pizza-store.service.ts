@@ -20,11 +20,11 @@ export class PizzaStoreService {
   }
 
   createToppingImageSignedUrl({filename, mimeType}) {
-    return this.toppingsService.createToppingImageSignedUrl({filename, mimeType});
+    return this.toppingsService.createToppingImageSignedUrl({filename, contentType: mimeType});
   }
 
-  uploadToppingImage({signedUrl, contentType}, {file, base64str}: ImageUpload) {
-    return this.s3Service.uploadToSignedUrl(signedUrl, contentType, {file, base64str: base64str});
+  uploadToppingImage({signedUrl, mimeType}, {file, base64str}: ImageUpload) {
+    return this.s3Service.uploadToSignedUrl(signedUrl, mimeType, {file, base64str});
   }
 
   getToppings(): Observable<Array<Topping>> {

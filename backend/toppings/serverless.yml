@@ -21,13 +21,9 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - "s3:PutObject"
-      Resource:
-        - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
-    - Effect: "Allow"
-      Action:
         - "s3:GetObject"
-        - "s3:PutBucketNotification"
+        - "s3:PutObject"
+        - "s3:PutObjectAcl"
       Resource:
         - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
     - Effect: "Allow"

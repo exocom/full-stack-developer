@@ -8,9 +8,8 @@ import {ImageMimeTypes, ImageUpload} from '../../models/images';
 import {switchMap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
 import {randomString} from '../../common/string';
-import {debug} from 'util';
 
-type Loading = { toppingValidation: boolean; toppingImage: boolean; toppingUpdate: boolean; };
+interface Loading { toppingValidation: boolean; toppingImage: boolean; toppingUpdate: boolean; }
 
 @Component({
   selector: 'app-topping',
@@ -58,9 +57,9 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  private async uploadImage({filename, contentType}, {file, base64str}: ImageUpload) {
+  private async uploadImage({filename, mimeType}, {file, base64str}: ImageUpload) {
     this.loading.toppingImage = true;
-    if (!Object.values(ImageMimeTypes).includes(contentType)) {
+    if (!Object.values(ImageMimeTypes).includes(mimeType)) {
       const toast = await this.toastCtrl.create({
         color: 'danger',
         cssClass: 'annoyed',
@@ -72,9 +71,9 @@ export class ToppingModalComponent implements OnInit {
       return;
     }
 
-    this.pizzaStoreService.createToppingImageSignedUrl({filename: file.name, mimeType: file.name})
+    this.pizzaStoreService.createToppingImageSignedUrl({filename, mimeType})
       .pipe(
-        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, contentType}, {file, base64str: base64str})),
+        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, mimeType}, {file, base64str})),
         switchMap((url) => {
           console.log(url);
           debugger;
@@ -123,16 +122,16 @@ export class ToppingModalComponent implements OnInit {
       this.toppingDataUrl = fileReader.result;
     };
     fileReader.readAsDataURL(file);
-    const contentType = getMIMEType(file.name);
-    return this.uploadImage({filename: file.name, contentType}, {file});
+    const mimeType = getMIMEType(file.name);
+    return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
   processPhoto(dataUrl: string) {
     this.loading.toppingImage = true;
     this.toppingDataUrl = dataUrl;
-    const [match, contentType, ext, base64str] = dataUrl.match(dataUrlRegExp);
+    const [match, mimeType, ext, base64str] = dataUrl.match(dataUrlRegExp);
     const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
-    return this.uploadImage({filename, contentType}, {base64str});
+    return this.uploadImage({filename, mimeType}, {base64str});
   }
 
   async save() {

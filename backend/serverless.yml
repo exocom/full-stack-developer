@@ -11,6 +11,18 @@ resources:  # CloudFormation template syntax
   Resources:
     ToppingsBucket:
       Type: AWS::S3::Bucket
+      Properties:
+        # Set the CORS policy
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+              MaxAge: 3000
   Outputs:
     ToppingsBucketName:
       Value:
