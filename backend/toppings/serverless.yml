@@ -38,6 +38,15 @@ provider:
       Resource: "*"
 
 functions:
+  uploadToppingImage:
+    handler: src/handler.uploadToppingImage
+    layers:
+      - ${self:custom.layers.node-modules}
+    events:
+      - http:
+          method: POST
+          path: topping-images
+          cors: true
   createTopping:
     handler: src/handler.createTopping
     layers:

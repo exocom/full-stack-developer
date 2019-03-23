@@ -1,9 +1,11 @@
 import {IsDefined, IsEnum, Matches, MaxLength, MinLength, ValidateNested, ValidationOptions} from 'class-validator';
 import {Transform, Type} from 'class-transformer';
-import {ToppingType} from './topping';
+import {ImageMimeTypes, ToppingType} from './topping';
 import {ObjectId} from 'mongodb';
 
 export const dataUrlRegExp = /^data:(.*?\/(.*?));base64,(.*$)/;
+
+export const imageFileNameRegExp = /^[-\w^&'@{}[\],$=!#().%+~].*?\.(gif|jpg|jpeg|tiff|png)$/i;
 
 const enumCustomErrorMessage: ValidationOptions = {
   message: ({property, constraints}) => {
@@ -17,6 +19,14 @@ export class ImageDataUrl {
   @IsDefined()
   @Matches(dataUrlRegExp)
   dataUrl: string;
+}
+
+export class UploadToppingImageBody {
+  @Matches(imageFileNameRegExp)
+  filename: string;
+
+  @IsEnum(ImageMimeTypes, enumCustomErrorMessage)
+  contentType: ImageMimeTypes;
 }
 
 export class CreateToppingBody {

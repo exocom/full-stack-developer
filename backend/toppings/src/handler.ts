@@ -6,9 +6,10 @@ import {
   CreateToppingBody,
   dataUrlRegExp,
   DeleteToppingPathParameters,
-  DetectToppingBody, ImageDataUrl,
+  DetectToppingBody,
   UpdateToppingBody,
-  UpdateToppingPathParameters
+  UpdateToppingPathParameters,
+  UploadToppingImageBody
 } from './models/request';
 import {MongoClient} from 'mongodb';
 import {Rekognition, S3} from 'aws-sdk';
@@ -38,6 +39,30 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
 };
 
 const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+
+export const uploadToppingImage: ApiGatewayHandler = async (event) => {
+  const body = deserialize(UploadToppingImageBody, event.body);
+  const bodyErrors = await validate(body) || [];
+  if (bodyErrors.length) {
+    const validation = [...bodyErrors];
+    const error = {
+      type: 'Validation',
+      message: 'Failed validation',
+      validation
+    };
+    return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
+  }
+  const {filename, contentType} = body;
+  const signedUrl = s3.getSignedUrl('putObject', {
+    Expires: 60,
+    Bucket: TOPPINGS_S3_BUCKET,
+    Key: `temp/${filename}`, // upload to temp, then setup rule on temp to remove after 5 min.
+    ContentType: contentType,
+    ACL: 'public-read'
+  });
+
+  return apiGatewayUtil.sendJson({statusCode: 201, body: {data: signedUrl}});
+};
 
 export const createTopping: ApiGatewayHandler = async (event) => {
   const client = await mongoClientConnect;
