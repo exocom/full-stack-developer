@@ -11,6 +11,7 @@ provider:
   profile: ${file(../serverless.yml):provider.profile}
   region: ${file(../serverless.yml):provider.region}
   stage: ${file(../serverless.yml):provider.stage}
+  timeout: 30
   memorySize: 128
   environment:
     MONGO_URI: ${file(../serverless.yml):provider.environment.MONGO_URI}
@@ -29,6 +30,12 @@ provider:
         - "s3:PutBucketNotification"
       Resource:
         - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
+    - Effect: "Allow"
+      Action:
+        - "rekognition:GetLabelDetection"
+        - "rekognition:DetectLabels"
+        - "rekognition:DetectText"
+      Resource: "*"
 
 functions:
   createTopping:
