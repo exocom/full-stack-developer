@@ -65,9 +65,9 @@ functions:
       - ${self:custom.layers.node-modules}
     events:
       - http:
-        method: PUT
-        path: toppings/{toppingId}
-        cors: true
+          method: PUT
+          path: toppings/{toppingId}
+          cors: true
 
   detectTopping:
     handler: src/handler.detectTopping
@@ -75,9 +75,9 @@ functions:
       - ${self:custom.layers.node-modules}
     events:
       - http:
-        method: POST
-        path: detect-topping
-        cors: true
+          method: POST
+          path: detect-topping
+          cors: true
 
 custom:
   localDevPort: 5000
