@@ -460,45 +460,243 @@ describe('toppings', () => {
     });
   });
 
-  describe('detect a cheese topping from an image', () => {
-    const imageName = 'cheese.jpg';
-    let dataUrl;
+  // NOTE: The results are interesting. Pretty descent for what it is.
+  describe.skip('detect toppings from images', () => {
+    describe('detect a cheese topping from an image 1', () => {
+      const imageName = 'cheese.jpg';
+      let dataUrl;
 
-    before(async () => {
-      const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
-      dataUrl = `data:image/jpeg;base64,${base64}`;
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a cheese topping 1', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Cheese);
+        assert.equal(data.name, 'Mozzarella');
+      });
     });
 
-    it('should return a cheese topping', async () => {
-      const requestBody = {dataUrl};
-      const {detectTopping} = handler;
-      const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
-      assert.equal(statusCode, 200);
-      assert.isString(body);
+    describe('detect a cheese topping from an image 2', () => {
+      const imageName = 'cheese2.jpg';
+      let dataUrl;
 
-      const {data} = JSON.parse(body);
-      assert.equal(data.name, 'Cheese');
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a cheese topping 2', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Cheese);
+        assert.equal(data.name, 'Cheddar');
+      });
     });
-  });
 
-  describe('detect a cheese topping from an image', () => {
-    const imageName = 'cheese2.jpg';
-    let dataUrl;
+    describe('detect a cheese topping from an image 3', () => {
+      const imageName = 'cheese3.jpg';
+      let dataUrl;
 
-    before(async () => {
-      const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
-      dataUrl = `data:image/jpeg;base64,${base64}`;
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a cheese topping 3', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Cheese);
+        assert.equal(data.name, 'American');
+      });
     });
 
-    it('should return a cheese topping', async () => {
-      const requestBody = {dataUrl};
-      const {detectTopping} = handler;
-      const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
-      assert.equal(statusCode, 200);
-      assert.isString(body);
+    describe('detect a seasoning topping from an image', () => {
+      const imageName = 'sea-salt.jpg';
+      let dataUrl;
 
-      const {data} = JSON.parse(body);
-      assert.equal(data.name, 'Cheese');
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a seasoning topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Seasoning);
+        assert.equal(data.name, 'Salt');
+      });
+    });
+
+    describe('detect a meat topping from an image', () => {
+      const imageName = 'sausage.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a meat topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Meat);
+        assert.equal(data.name, 'Sausage');
+      });
+    });
+
+    describe('detect a sauce topping from an image', () => {
+      const imageName = 'sauce.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a sauce topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Sauce);
+        assert.equal(data.name, 'Marinara');
+      });
+    });
+
+    describe('detect a vegetable topping from an image', () => {
+      const imageName = 'green-peppers.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a vegetable topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Vegetable);
+        assert.equal(data.name, 'Pepper');
+      });
+    });
+
+    describe('detect a fruit topping from an image', () => {
+      const imageName = 'pineapple.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a fruit topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Fruit);
+        assert.equal(data.name, 'Pineapple');
+      });
+    });
+
+    describe('detect a fruit topping from an image 2', () => {
+      const imageName = 'whole-pineapple.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a fruit topping 2', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Fruit);
+        assert.equal(data.name, 'Pineapple');
+      });
+    });
+
+    describe('detect a shoe topping from an image', () => {
+      const imageName = 'shoe.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return a shoe topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 200);
+        assert.isString(body);
+
+        const {data} = JSON.parse(body);
+        assert.equal(data.type.toLowerCase(), ToppingType.Seasoning);
+        assert.equal(data.name, 'Shoe');
+      });
+    });
+
+    describe('detect no toppings from an image', () => {
+      const imageName = 'tesla-roadster.jpg';
+      let dataUrl;
+
+      before(async () => {
+        const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+        dataUrl = `data:image/jpeg;base64,${base64}`;
+      });
+
+      it('should return no topping', async () => {
+        const requestBody = {dataUrl};
+        const {detectTopping} = handler;
+        const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+        assert.equal(statusCode, 404);
+      });
     });
   });
 });

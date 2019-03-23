@@ -185,8 +185,9 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
   const matches = dataUrl.match(dataUrlRegExp);
   const [all, contentType, ext, base64data] = matches;
 
+  try {
     const result = await rekognition.detectLabels({
-      Image: {Bytes: Buffer.from(base64data, 'base64')}
+      Image: {Bytes: Buffer.from(base64data, 'base64')}, MinConfidence: 65, MaxLabels: 15
     }).promise().catch(err => {
       console.log('ERROR', err);
     });
@@ -208,30 +209,36 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
     if (!food) {
       return apiGatewayUtil.sendJson({statusCode: 404});
     }
-    const [bestGuess] = result.Labels.filter(l => l.Name !== 'Food');
-    let toppingType: ToppingType = null;
+    const [bestGuess] = result.Labels.filter(l => l.Name !== 'Food' && !toppingTypeRegExp.test(l.Name) && l.Parents.find(l => l.Name === 'Food'));
+    let type: ToppingType = null;
     for (const label of result.Labels) {
       if (toppingTypeRegExp.test(label.Name)) {
-        toppingType = label.Name as ToppingType;
+        type = label.Name as ToppingType;
         break;
       }
     }
-    if (!toppingType) { // Getting desperate!
+    if (!type) { // Getting desperate!
       for (const label of result.Labels) {
+        if (label.Parents) {
+          const food = label.Parents.find(l => l.Name === 'Food');
+          if (!food) {
+            continue;
+          }
+        }
         if (cheeseRegExp.test(label.Name)) {
-          toppingType = ToppingType.Cheese;
+          type = ToppingType.Cheese;
           break;
         }
         if (sauceRegExp.test(label.Name)) {
-          toppingType = ToppingType.Sauce;
+          type = ToppingType.Sauce;
           break;
         }
         if (meatRegExp.test(label.Name)) {
-          toppingType = ToppingType.Meat;
+          type = ToppingType.Meat;
           break;
         }
         if (seasoningRegExp.test(label.Name)) {
-          toppingType = ToppingType.Seasoning;
+          type = ToppingType.Seasoning;
           break;
         }
       }
@@ -239,15 +246,14 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
 
     const toppingBase: ToppingBase = {
       name: bestGuess.Name,
-      type: ToppingType.Seasoning
+      type
     };
     return apiGatewayUtil.sendJson({statusCode: 200, body: {data: toppingBase}});
-
-  // } catch (e) {
-  //   const error = {
-  //     type: 'Upload Failure',
-  //     message: 'Unable to process the image.'
-  //   };
-  //   return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
-  // }
+  } catch (e) {
+    const error = {
+      type: 'Upload Failure',
+      message: 'Unable to process the image.'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
+  }
 };

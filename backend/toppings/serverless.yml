@@ -66,6 +66,13 @@ functions:
     events:
       - http: PUT toppings/{toppingId}
 
+  detectTopping:
+    handler: src/handler.detectTopping
+    layers:
+      - ${self:custom.layers.node-modules}
+    events:
+      - http: POST detect-topping
+
 custom:
   localDevPort: 5000
   webpack:
