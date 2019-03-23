@@ -20,6 +20,11 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
+  processPhoto(dataUrl: string) {
+    console.log('Got Photo');
+    console.log(dataUrl);
+  }
+
   save() {
     // if (this.signaturePadDirective.signaturePad.isEmpty()) {
     //   return this.modalController.dismiss(null);

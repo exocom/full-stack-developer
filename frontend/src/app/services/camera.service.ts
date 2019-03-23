@@ -10,7 +10,7 @@ export class CameraService {
   constructor() {
   }
 
-  get hasCameraHardware(): boolean {
+  get hasCameraHardware(): Readonly<boolean> {
     return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   }
 

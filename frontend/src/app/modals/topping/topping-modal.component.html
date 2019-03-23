@@ -1,1 +1,20 @@
-<ion-button (click)="closeModal()">Close</ion-button>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Topping Editor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content scrollY="false">
+  <form>
+    <!--TODO ngIf no photo-->
+    <app-camera-pad (photoCaptured)="processPhoto($event)"></app-camera-pad>
+
+    <!--TODO ngIf photo w/ processing-->
+
+    <!--TODO ngIf valid photo (processed)-->
+
+  </form>
+</ion-content>

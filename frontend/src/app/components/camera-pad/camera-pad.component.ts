@@ -14,6 +14,7 @@ export class CameraPadComponent implements OnInit, OnDestroy {
   mediaStream: MediaStream;
   videoTrack: MediaStreamTrack;
   cameraPermissions$: Observable<PermissionStatus> = this.cameraService.getCameraPermissionStatus();
+  hasCameraHardware: Readonly<boolean> = !this.cameraService.hasCameraHardware;
 
   constructor(private cameraService: CameraService, private elementRef: ElementRef) {
   }

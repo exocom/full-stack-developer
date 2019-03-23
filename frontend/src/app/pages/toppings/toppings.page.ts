@@ -31,6 +31,7 @@ export class ToppingsPage implements OnInit {
   }
 
   ngOnInit() {
+    setTimeout(() => this.createTopping(), 200);
   }
 
   async removeTopping(topping: Topping) {

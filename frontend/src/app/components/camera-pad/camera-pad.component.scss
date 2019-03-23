@@ -1,4 +1,17 @@
-canvas {
-  position: absolute;
-  visibility: hidden;
+.camera-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ccc;
+  position: relative;
+
+  canvas {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  ion-fab-button {
+    position: absolute;
+    bottom: 5px;
+  }
 }

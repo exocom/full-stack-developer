@@ -1,20 +1,29 @@
-<ng-container *ngIf="cameraPermissions$ | async as cameraPermissions">
-  <div *ngIf="cameraPermissions.state !== 'granted'" class="cloud-error">
-    <div padding-horizontal>
+<ng-container *ngIf="hasCameraHardware else noCamera">
+  <div class="camera-area" *ngIf="cameraPermissions$ | async as cameraPermissions">
+    <div *ngIf="cameraPermissions.state !== 'granted'" class="cloud-error">
       <div padding-horizontal>
-        <ion-img src="/assets/teacher-at-chalkboard.svg"></ion-img>
+        <div padding-horizontal>
+          <ion-img src="/assets/teacher-at-chalkboard.svg"></ion-img>
+        </div>
+        <h1>
+          <ion-text color="danger">Umm sorry.</ion-text>
+        </h1>
+        <p>
+          Allow this app to access your camera.<br/>
+          Look for the location icon <i class="mbsc-ic mbsc-ic-material-photo-camera"></i> and click it to
+          accept camera access.
+        </p>
+        <ion-note>Hint: Then try again to see if the camera activates.</ion-note>
       </div>
-      <h1>
-        <ion-text color="danger">Umm sorry.</ion-text>
-      </h1>
-      <p>
-        Allow this app to access your camera.<br/>
-        Look for the location icon <i class="mbsc-ic mbsc-ic-material-photo-camera"></i> and click it to
-        accept camera access.
-      </p>
-      <ion-note>Hint: Then try again to see if the camera activates.</ion-note>
     </div>
   </div>
+  <video #video autoplay playsinline muted></video>
+  <ion-fab-button color="light" (click)="takePhoto(video)"></ion-fab-button>
 </ng-container>
-<video #video autoplay playsinline muted></video>
-<ion-fab-button color="light" (click)="takePhoto(video)"></ion-fab-button>
+
+<ng-template #noCamera>
+  <app-image-message>
+    <ion-img src="/assets/witch-tree.svg"></ion-img>
+
+  </app-image-message>
+</ng-template>
