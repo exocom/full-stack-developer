@@ -229,7 +229,7 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
     if (!food) {
       return apiGatewayUtil.sendJson({statusCode: 404});
     }
-    const [bestGuess] = result.Labels.filter(l => l.Name !== 'Food' && !toppingTypeRegExp.test(l.Name) && l.Parents.find(l => l.Name === 'Food'));
+    const [bestGuess] = result.Labels.filter(l => l.Name !== 'Food' && !toppingTypeRegExp.test(l.Name) && l.Parents && l.Parents.find(l => l.Name === 'Food'));
     let type: ToppingType = null;
     for (const label of result.Labels) {
       if (toppingTypeRegExp.test(label.Name)) {
@@ -265,13 +265,14 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
     }
 
     const toppingBase: ToppingBase = {
-      name: bestGuess.Name,
+      name: bestGuess && bestGuess.Name || null, // NOTE: could return the 1st item in the array, but seems ghetto.
       type
     };
     return apiGatewayUtil.sendJson({statusCode: 200, body: {data: toppingBase}});
   } catch (e) {
+    console.log('==ERROR==', e);
     const error = {
-      type: 'Upload Failure',
+      type: 'Unknown',
       message: 'Unable to process the image.'
     };
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});

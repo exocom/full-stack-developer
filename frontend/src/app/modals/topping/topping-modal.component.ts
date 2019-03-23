@@ -87,7 +87,7 @@ export class ToppingModalComponent implements OnInit {
             })
           );
         }),
-        switchMap(() => this.pizzaStoreService.detectTopping(filename))
+        switchMap(() => this.pizzaStoreService.detectTopping({filename: `temp/${filename}`}))
       )
       .subscribe((toppingBase) => {
         const {name, type} = toppingBase;
