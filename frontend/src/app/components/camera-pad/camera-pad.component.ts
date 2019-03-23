@@ -42,15 +42,26 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.orientationChange();
       window.addEventListener('orientationchange', this.orientationChange.bind(this), false);
       window.addEventListener('resize', this.orientationChange.bind(this), false);
+
+      if (this.cameraAudioMap) {
+        const {audioContext} = this.cameraAudioMap;
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+      }
     });
   }
 
   ngAfterViewInit(): void {
     const audioElement = this.cameraAudio.nativeElement;
-    const audioContext = new AudioContext();
+    // @ts-ignore
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) {
+      return;
+    }
+    const audioContext = new AC();
     const track = audioContext.createMediaElementSource(audioElement);
     track.connect(audioContext.destination);
-
     this.cameraAudioMap = {audioContext, audioElement, track};
   }
 
@@ -100,6 +111,9 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataUrl = canvas.toDataURL('image/png');
     this.photoCaptured.next(dataUrl);
 
+    if (!this.cameraAudioMap) {
+      return;
+    }
     const {audioElement, audioContext} = this.cameraAudioMap;
     if (audioContext.state === 'suspended') {
       await audioContext.resume();

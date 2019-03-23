@@ -21,8 +21,7 @@ export class ToppingModalComponent implements OnInit {
   }
 
   processPhoto(dataUrl: string) {
-    console.log('Got Photo');
-    console.log(dataUrl);
+    console.log('Got Photo', !!dataUrl);
   }
 
   save() {
