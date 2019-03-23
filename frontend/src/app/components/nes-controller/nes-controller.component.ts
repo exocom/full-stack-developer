@@ -99,7 +99,6 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log();
     window.removeEventListener('keydown', this.keyDown);
   }
 

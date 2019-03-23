@@ -11,7 +11,9 @@
   <form [formGroup]="toppingFormGroup" flex-row>
     <!--TODO ngIf no photo-->
     <div formGroupName="image" class="image-group">
-      <ion-img class="a" *ngIf="dataUrlFormControl.value else noImage" [src]="dataUrlFormControl.value"></ion-img>
+      <ng-container *ngIf="urlFormControl.value || dataUrlFormControl.value else noImage">
+        <ion-img [src]="urlFormControl.value || dataUrlFormControl.value"></ion-img>
+      </ng-container>
 
       <ng-template #noImage>
         <app-camera-pad *ngIf="!toppingDataUrl" (photoCaptured)="processPhoto($event)"></app-camera-pad>

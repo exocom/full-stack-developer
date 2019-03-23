@@ -18,15 +18,18 @@ export class ToppingModalComponent implements OnInit {
   toppingTypes = ToppingType;
 
   imageFormGroup = this.fb.group({
-    dataUrl: [Defaults.topping.image.url, Validators.required]
+    dataUrl: [Defaults.topping.image.url],
+    url: [null]
   });
   toppingFormGroup = this.fb.group({
+    id: [null],
     image: this.imageFormGroup,
     name: [Defaults.topping.name, Validators.required],
     type: [Defaults.topping.type, Validators.required]
   });
 
   dataUrlFormControl = this.imageFormGroup.get('dataUrl') as FormControl;
+  urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
   toppingDataUrl: string;
 
@@ -38,6 +41,9 @@ export class ToppingModalComponent implements OnInit {
   }
 
   async ngOnInit() {
+    if (this.topping) {
+      this.toppingFormGroup.patchValue(this.topping, {emitEvent: false});
+    }
   }
 
   closeModal() {
@@ -49,7 +55,7 @@ export class ToppingModalComponent implements OnInit {
     this.loading.toppingValidation = true;
     this.pizzaStoreService.detectTopping({dataUrl}).subscribe((toppingBase) => {
       const {name, type} = toppingBase;
-      this.toppingFormGroup.setValue({name, type, image: {dataUrl}});
+      this.toppingFormGroup.patchValue({name, type, image: {dataUrl}});
 
       this.loading.toppingValidation = false;
       this.toppingDataUrl = null;
@@ -91,11 +97,12 @@ export class ToppingModalComponent implements OnInit {
       await toast.present();
       await this.closeModal();
       this.loading.toppingUpdate = false;
-    }, async () => {
+    }, async (res) => {
+      const message = res && res.error && res.error.error && res.error.error.message || 'Important message goes here!';
       const toast = await this.toastCtrl.create({
         color: 'danger',
         cssClass: 'shocked',
-        message: 'Something went wrong!\nImportant message goes here!',
+        message: `Something went wrong!\n${message}`,
         showCloseButton: true
       });
       await toast.present();
