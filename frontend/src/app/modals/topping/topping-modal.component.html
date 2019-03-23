@@ -9,7 +9,7 @@
 
 <ion-content scrollY="false">
   <form [formGroup]="toppingFormGroup" flex-row>
-    <!--TODO ngIf no photo-->
+    <!--
     <div formGroupName="image" class="image-group">
       <ng-container *ngIf="urlFormControl.value || dataUrlFormControl.value else noImage">
         <ion-img [src]="urlFormControl.value || dataUrlFormControl.value"></ion-img>
@@ -22,6 +22,9 @@
       </ng-template>
       <ion-input type="hidden" formControlName="dataUrl"></ion-input>
     </div>
+    -->
+
+    <app-file-upload-zone></app-file-upload-zone>
 
     <ion-item>
       <ion-label position="stacked">Name</ion-label>

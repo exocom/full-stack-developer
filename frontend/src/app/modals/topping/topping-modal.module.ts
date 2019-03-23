@@ -4,6 +4,7 @@ import {ToppingModalComponent} from './topping-modal.component';
 import {CameraPadModule} from '../../components/camera-pad/camera-pad.module';
 import {IonicModule} from '@ionic/angular';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FileUploadZoneModule} from '../../components/file-upload-zone/file-upload-zone.module';
 
 @NgModule({
   declarations: [ToppingModalComponent],
@@ -13,6 +14,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     IonicModule,
     FormsModule,
     ReactiveFormsModule,
+    FileUploadZoneModule,
     CameraPadModule
   ],
   exports: [ToppingModalComponent]

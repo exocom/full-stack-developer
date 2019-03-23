@@ -1,0 +1,10 @@
+<div class="dropzone"
+     appfileDrop
+     (filesDropped)="handleDrop($event)"
+     (filesHovered)="dropzoneState($event)"
+     [ngClass]="{'active': dropzoneActive}">
+
+  <ion-icon type="upload" size="large"></ion-icon>
+
+</div>
+<input #fileInput type="file">

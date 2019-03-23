@@ -30,7 +30,7 @@ export class ToppingsPage implements OnInit {
   }
 
   async ngOnInit() {
-    // setTimeout(() => this.createTopping(), 200);
+    setTimeout(() => this.createTopping(), 200);
 
     // const toast = await this.toastCtrl.create({
     //   color: 'secondary',
