@@ -1,17 +1,50 @@
-.camera-area {
+:host {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ccc;
   position: relative;
+  background: #ccc;
+}
 
-  canvas {
+canvas {
+  position: absolute;
+  visibility: hidden;
+}
+
+ion-fab-button {
+  position: absolute;
+  bottom: 5px;
+  border-radius: 30px;
+  box-shadow: inset -2px 4px 2px #ccc, 0 0 4px 2px #111;
+}
+
+video.hidden {
+  display: none;
+}
+
+.teacher {
+  padding-top: 10px;
+  background-clip: border-box;
+  background: var(--background);
+
+  p {
     position: absolute;
-    visibility: hidden;
+    right: 5.5%;
+    top: 10px;
+    width: 56%;
+    text-align: justify;
+    line-height: 17px;
+
+    ion-icon {
+      position: relative;
+      top: 3px;
+    }
   }
 
-  ion-fab-button {
+  h1 {
     position: absolute;
-    bottom: 5px;
+    bottom: 21%;
+    left: 39%;
   }
+
 }

@@ -1,29 +1,38 @@
 <ng-container *ngIf="hasCameraHardware else noCamera">
-  <div class="camera-area" *ngIf="cameraPermissions$ | async as cameraPermissions">
-    <div *ngIf="cameraPermissions.state !== 'granted'" class="cloud-error">
-      <div padding-horizontal>
-        <div padding-horizontal>
-          <ion-img src="/assets/teacher-at-chalkboard.svg"></ion-img>
-        </div>
-        <h1>
-          <ion-text color="danger">Umm sorry.</ion-text>
-        </h1>
-        <p>
-          Allow this app to access your camera.<br/>
-          Look for the location icon <i class="mbsc-ic mbsc-ic-material-photo-camera"></i> and click it to
-          accept camera access.
-        </p>
-        <ion-note>Hint: Then try again to see if the camera activates.</ion-note>
-      </div>
+
+  <video #video autoplay playsinline muted [class.hidden]="(cameraPermissions$ | async)?.state !== 'granted'"></video>
+  <audio #cameraAudio src="/assets/audio/camera-shutter-click.mp3" type="audio/mpeg"></audio>
+  <ng-container *ngIf="(cameraPermissions$ | async)?.state === 'granted' else noPermissions">
+    <ion-fab-button color="light" (click)="takePhoto(video)" size="small">
+      <ion-icon size="large" name="radio-button-off"></ion-icon>
+    </ion-fab-button>
+  </ng-container>
+
+  <ng-template #noPermissions>
+    <div class="teacher" style="position: relative">
+      <ion-img src="/assets/teacher-at-chalkboard.svg"></ion-img>
+      <p>
+        <ion-text color="light">
+          Allow this app to access your camera.
+          Look for the camera icon
+          <ion-icon name="videocam"></ion-icon>
+          and click it to accept camera access.
+        </ion-text>
+      </p>
+      <h1>
+        <ion-text color="danger">I'll help you out!</ion-text>
+      </h1>
     </div>
-  </div>
-  <video #video autoplay playsinline muted></video>
-  <ion-fab-button color="light" (click)="takePhoto(video)"></ion-fab-button>
+  </ng-template>
 </ng-container>
 
 <ng-template #noCamera>
   <app-image-message>
-    <ion-img src="/assets/witch-tree.svg"></ion-img>
-
+    <ion-img src="/assets/witch-tree.svg" alt="Witch Tree"></ion-img>
+    <h1 no-margin>
+      <ion-text color="danger">No Camera!</ion-text>
+    </h1>
+    <p no-margin>Well there is nothing I can do about that. Just sleep. (Tree casts 'SLEEP2')</p>
+    <ion-note style="font-size: 8px;">Hint: Try running this on a modern mobile phone.</ion-note>
   </app-image-message>
 </ng-template>

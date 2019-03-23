@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CameraService} from '../../services/camera.service';
 
@@ -7,14 +7,21 @@ import {CameraService} from '../../services/camera.service';
   templateUrl: './camera-pad.component.html',
   styleUrls: ['./camera-pad.component.scss']
 })
-export class CameraPadComponent implements OnInit, OnDestroy {
-  @ViewChild('video') video;
+export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('video') video: ElementRef<HTMLVideoElement>;
+  @ViewChild('cameraAudio') cameraAudio: ElementRef<HTMLAudioElement>;
   @Output() photoCaptured = new EventEmitter<string>();
 
   mediaStream: MediaStream;
   videoTrack: MediaStreamTrack;
   cameraPermissions$: Observable<PermissionStatus> = this.cameraService.getCameraPermissionStatus();
-  hasCameraHardware: Readonly<boolean> = !this.cameraService.hasCameraHardware;
+  hasCameraHardware: Readonly<boolean> = this.cameraService.hasCameraHardware;
+
+  private cameraAudioMap: {
+    audioElement: HTMLAudioElement;
+    audioContext: AudioContext;
+    track: MediaElementAudioSourceNode;
+  };
 
   constructor(private cameraService: CameraService, private elementRef: ElementRef) {
   }
@@ -36,6 +43,15 @@ export class CameraPadComponent implements OnInit, OnDestroy {
       window.addEventListener('orientationchange', this.orientationChange.bind(this), false);
       window.addEventListener('resize', this.orientationChange.bind(this), false);
     });
+  }
+
+  ngAfterViewInit(): void {
+    const audioElement = this.cameraAudio.nativeElement;
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(audioElement);
+    track.connect(audioContext.destination);
+
+    this.cameraAudioMap = {audioContext, audioElement, track};
   }
 
   ngOnDestroy(): void {
@@ -66,7 +82,7 @@ export class CameraPadComponent implements OnInit, OnDestroy {
   }
 
 
-  takePhoto(video: HTMLVideoElement) {
+  async takePhoto(video: HTMLVideoElement) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -83,5 +99,11 @@ export class CameraPadComponent implements OnInit, OnDestroy {
     context.drawImage(video, 0, 0, w, h);
     const dataUrl = canvas.toDataURL('image/png');
     this.photoCaptured.next(dataUrl);
+
+    const {audioElement, audioContext} = this.cameraAudioMap;
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+    await audioElement.play();
   }
 }

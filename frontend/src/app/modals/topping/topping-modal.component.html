@@ -8,13 +8,13 @@
 </ion-header>
 
 <ion-content scrollY="false">
+  <!--TODO ngIf no photo-->
+  <app-camera-pad (photoCaptured)="processPhoto($event)"></app-camera-pad>
+
+  <!--TODO ngIf photo w/ processing-->
+
+  <!--TODO ngIf valid photo (processed)-->
   <form>
-    <!--TODO ngIf no photo-->
-    <app-camera-pad (photoCaptured)="processPhoto($event)"></app-camera-pad>
-
-    <!--TODO ngIf photo w/ processing-->
-
-    <!--TODO ngIf valid photo (processed)-->
 
   </form>
 </ion-content>
