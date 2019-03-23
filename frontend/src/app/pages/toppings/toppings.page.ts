@@ -94,7 +94,5 @@ export class ToppingsPage implements OnInit {
       componentProps: {topping}
     });
     await modal.present();
-    const {data} = await modal.onDidDismiss();
-    console.log(data);
   }
 }

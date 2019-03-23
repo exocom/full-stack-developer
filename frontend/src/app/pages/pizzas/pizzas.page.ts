@@ -73,8 +73,6 @@ export class PizzasPage implements OnInit {
       componentProps: {pizza}
     });
     await modal.present();
-    const {data} = await modal.onDidDismiss();
-    console.log(data);
   }
 }
 
