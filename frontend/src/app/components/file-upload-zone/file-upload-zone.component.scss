@@ -1,9 +1,17 @@
 .dropzone {
   border: 2px dashed #aaa;
   background-color: #ccc;
+  padding: 30px;
+  font-size: 80px;
+  cursor: pointer;
+
+  &.hovered {
+    background-color: var(--ion-color-light);
+    border-color: var(--ion-color-light-shade);
+  }
 }
 
 input {
-  display: none;
-  visibility: hidden;
+  position: absolute;
+  z-index: -1;
 }

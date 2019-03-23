@@ -20,6 +20,11 @@ export class ToppingsService {
   constructor(private http: HttpClient) {
   }
 
+  createToppingImageSignedUrl({filename, mimeType}): Observable<string> {
+    return this.http.post <ApiResponse<string>>(`${this.url}/topping-image-signed-url`, {filename, mimeType}, this.httpOptions)
+      .pipe(map(body => body.data));
+  }
+
   getToppings(): Observable<Array<Topping>> {
     return this.http.get<ApiResponse<Array<Topping>>>(`${this.url}/toppings`, this.httpOptions)
       .pipe(map(body => plainToClass(Topping, body.data)));

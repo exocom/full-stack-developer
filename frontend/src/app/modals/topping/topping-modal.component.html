@@ -24,7 +24,7 @@
     </div>
     -->
 
-    <app-file-upload-zone></app-file-upload-zone>
+    <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
 
     <ion-item>
       <ion-label position="stacked">Name</ion-label>

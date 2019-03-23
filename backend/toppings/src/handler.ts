@@ -40,7 +40,7 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
 
 const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
 
-export const uploadToppingImage: ApiGatewayHandler = async (event) => {
+export const createToppingImageSingedUrl: ApiGatewayHandler = async (event) => {
   const body = deserialize(UploadToppingImageBody, event.body);
   const bodyErrors = await validate(body) || [];
   if (bodyErrors.length) {

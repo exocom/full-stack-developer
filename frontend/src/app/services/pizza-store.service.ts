@@ -6,6 +6,7 @@ import {exhaustMap, shareReplay, tap} from 'rxjs/operators';
 import {CreatePizzaBody, CreateToppingBody, UpdateToppingBody} from './contract/models/request';
 import {Pizza} from './contract/models/pizza';
 import {PizzasService} from './contract/pizzas.service';
+import {S3Service} from './contract/s3.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,15 @@ export class PizzaStoreService {
   private _refreshToppings: BehaviorSubject<boolean> = new BehaviorSubject(true);
   private _refreshPizzas: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(private pizzasService: PizzasService, private toppingsService: ToppingsService) {
+  constructor(private pizzasService: PizzasService, private s3Service: S3Service, private toppingsService: ToppingsService) {
+  }
+
+  createToppingImageSignedUrl({filename, mimeType}) {
+    return this.toppingsService.createToppingImageSignedUrl({filename, mimeType});
+  }
+
+  uploadToppingImage({signedUrl, contentType}, {file, base64data}) {
+    return this.s3Service.uploadToSignedUrl(signedUrl, contentType, {file, base64data});
   }
 
   getToppings(): Observable<Array<Topping>> {

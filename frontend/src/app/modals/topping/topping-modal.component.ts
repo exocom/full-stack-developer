@@ -3,6 +3,13 @@ import {Defaults, Topping, ToppingType} from '../../services/contract/models/top
 import {ModalController, NavParams, ToastController} from '@ionic/angular';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {PizzaStoreService} from '../../services/pizza-store.service';
+import {getMIMEType} from 'mim';
+import {ImageMimeTypes} from '../../models/images';
+import {switchMap} from 'rxjs/operators';
+import {dataUrlRegExp} from '../../services/contract/models/request';
+import {randomString} from '../../common/string';
+
+type Loading = { toppingValidation: boolean; toppingImage: boolean; toppingUpdate: boolean; };
 
 @Component({
   selector: 'app-topping',
@@ -12,7 +19,7 @@ import {PizzaStoreService} from '../../services/pizza-store.service';
 export class ToppingModalComponent implements OnInit {
   @Input() topping: Topping;
 
-  loading: { toppingValidation: boolean; toppingUpdate: boolean; } = {toppingValidation: false, toppingUpdate: false};
+  loading: Loading = {toppingValidation: false, toppingUpdate: false, toppingImage: false};
 
   objectKeys = Object.keys;
   toppingTypes = ToppingType;
@@ -50,26 +57,79 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  processPhoto(dataUrl: string) {
-    this.toppingDataUrl = dataUrl;
-    this.loading.toppingValidation = true;
-    this.pizzaStoreService.detectTopping({dataUrl}).subscribe((toppingBase) => {
-      const {name, type} = toppingBase;
-      this.toppingFormGroup.patchValue({name, type, image: {dataUrl}});
-
-      this.loading.toppingValidation = false;
-      this.toppingDataUrl = null;
-    }, async (res) => {
+  private async uploadImage({filename, contentType}, {file, base64data}: { file?: File; base64data?: string; }) {
+    this.loading.toppingImage = true;
+    if (!Object.values(ImageMimeTypes).includes(contentType)) {
       const toast = await this.toastCtrl.create({
         color: 'danger',
         cssClass: 'annoyed',
-        message: 'That is not food!\n Please take another photo.',
+        message: 'That is not an image!\n Please select another photo.',
         showCloseButton: true
       });
       await toast.present();
-      this.loading.toppingValidation = false;
-      this.toppingDataUrl = null;
-    });
+      this.loading.toppingImage = false;
+      return;
+    }
+
+    this.pizzaStoreService.createToppingImageSignedUrl({filename: file.name, mimeType: file.name})
+      .pipe(
+        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, contentType}, {file, base64data})),
+        switchMap((url) => {
+          // TODO : get url from aws payload?
+          this.toppingFormGroup.patchValue({image: {filename, url}});
+        })
+        /*
+        .subscribe((toppingBase) => {
+  const {name, type} = toppingBase;
+  this.toppingFormGroup.patchValue({name, type});
+
+  this.loading.toppingValidation = false;
+}, async (res) => {
+  const toast = await this.toastCtrl.create({
+    color: 'danger',
+    cssClass: 'shocked',
+    message: `Is that even food!\n Sorry I can't help.`,
+    showCloseButton: true
+  });
+  await toast.present();
+  this.loading.toppingValidation = false;
+});
+
+
+
+         */
+        // })
+      )
+      .subscribe(() => {
+        this.loading.toppingImage = false;
+      }, async (res) => {
+        const message = res && res.error && res.error.error && res.error.error.message || 'Important message goes here!';
+        const toast = await this.toastCtrl.create({
+          color: 'danger',
+          cssClass: 'shocked',
+          message: `Something went wrong!\n${message}`,
+          showCloseButton: true
+        });
+        await toast.present();
+        this.loading.toppingImage = false;
+      });
+
+    return this.pizzaStoreService.detectTopping({filename});
+  }
+
+  processFile(file: File) {
+    // TODO : Preview image?
+    this.loading.toppingImage = true;
+    const mimeType = getMIMEType(file.name);
+    return this.uploadImage({filename: file.name, contentType: mimeType}, {file});
+  }
+
+  processPhoto(dataUrl: string) {
+    this.toppingDataUrl = dataUrl;
+    const [match, contentType, ext, base64data] = dataUrl.match(dataUrlRegExp);
+    const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
+    return this.uploadImage({filename, contentType}, {base64data});
+
   }
 
   async save() {

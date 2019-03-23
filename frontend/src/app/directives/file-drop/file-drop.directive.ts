@@ -1,32 +1,41 @@
-import {Directive, EventEmitter, HostListener, Output} from '@angular/core';
+import {Directive, EventEmitter, HostListener, Input, Output} from '@angular/core';
 
 @Directive({
   selector: '[appFileDrop]',
+  exportAs: 'appFileDrop'
 })
 export class FileDropDirective {
   @Output() filesDropped = new EventEmitter<FileList>();
-  @Output() filesHovered = new EventEmitter<boolean>();
+  filesHovered = false;
 
   constructor() {
   }
 
   @HostListener('drop', ['$event'])
-  onDrop($event) {
-    $event.preventDefault();
-
-    const transfer = $event.dataTransfer;
-    this.filesDropped.emit(transfer.files);
-    this.filesHovered.emit(false);
+  onDrop(event) {
+    event.preventDefault();
+    const {files} = event.dataTransfer;
+    this.filesDropped.emit(files);
+    if (this.filesHovered === false) {
+      return;
+    }
+    this.filesHovered = false;
   }
 
   @HostListener('dragover', ['$event'])
-  onDragOver($event) {
+  onDragOver(event) {
     event.preventDefault();
-    this.filesHovered.emit(true);
+    if (this.filesHovered === true) {
+      return;
+    }
+    this.filesHovered = true;
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave($event) {
-    this.filesHovered.emit(false);
+  onDragLeave(event) {
+    if (this.filesHovered === false) {
+      return;
+    }
+    this.filesHovered = false;
   }
 }

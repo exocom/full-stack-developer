@@ -38,14 +38,14 @@ provider:
       Resource: "*"
 
 functions:
-  uploadToppingImage:
-    handler: src/handler.uploadToppingImage
+  createToppingImageSingedUrl:
+    handler: src/handler.createToppingImageSingedUrl
     layers:
       - ${self:custom.layers.node-modules}
     events:
       - http:
           method: POST
-          path: topping-images
+          path: topping-image-signed-url
           cors: true
   createTopping:
     handler: src/handler.createTopping

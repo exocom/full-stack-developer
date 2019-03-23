@@ -1,10 +1,6 @@
-<div class="dropzone"
-     appfileDrop
-     (filesDropped)="handleDrop($event)"
-     (filesHovered)="dropzoneState($event)"
-     [ngClass]="{'active': dropzoneActive}">
-
-  <ion-icon type="upload" size="large"></ion-icon>
-
-</div>
-<input #fileInput type="file">
+<input #inputElement id="image" type="file" (change)="handleSelect($event)" [multiple]="multiple"/>
+<label class="dropzone ion-align-self-center ion-justify-content-center" [class.hovered]="afd.filesHovered" flex
+       for="image"
+       appFileDrop #afd="appFileDrop" (filesDropped)="handleDrop($event)">
+  <ion-icon [color]="afd.filesHovered ? 'success' : ''" name="md-cloud-upload"></ion-icon>
+</label>
