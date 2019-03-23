@@ -204,11 +204,10 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
 
-  const {dataUrl} = body;
-  const [match, contentType, ext, base64data] = dataUrl.match(dataUrlRegExp);
+  const {filename} = body;
   try {
     const result = await rekognition.detectLabels({
-      Image: {Bytes: Buffer.from(base64data, 'base64')}, MinConfidence: 65, MaxLabels: 15
+      Image: {S3Object: {Bucket: TOPPINGS_S3_BUCKET, Name: filename}}, MinConfidence: 65, MaxLabels: 15
     }).promise().catch(err => {
       console.log('ERROR', err);
     });

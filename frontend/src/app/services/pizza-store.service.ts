@@ -19,7 +19,7 @@ export class PizzaStoreService {
   constructor(private pizzasService: PizzasService, private s3Service: S3Service, private toppingsService: ToppingsService) {
   }
 
-  createToppingImageSignedUrl({filename, mimeType}) {
+  createToppingImageSignedUrl({filename, mimeType}): Observable<string> {
     return this.toppingsService.createToppingImageSignedUrl({filename, contentType: mimeType});
   }
 
@@ -52,8 +52,8 @@ export class PizzaStoreService {
     );
   }
 
-  detectTopping({dataUrl}): Observable<ToppingBase> {
-    return this.toppingsService.detectTopping(dataUrl);
+  detectTopping({filename}) {
+    return this.toppingsService.detectTopping(filename);
   }
 
   getPizzas(): Observable<Array<Pizza>> {

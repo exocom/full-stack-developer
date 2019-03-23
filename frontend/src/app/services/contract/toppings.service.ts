@@ -44,8 +44,8 @@ export class ToppingsService {
     return this.http.delete<void>(`${this.url}/toppings/${toppingId}`, this.httpOptions);
   }
 
-  detectTopping(dataUrl): Observable<ToppingBase> {
-    return this.http.post<ApiResponse<ToppingBase>>(`${this.url}/detect-topping`, {dataUrl}, this.httpOptions)
+  detectTopping(filename) {
+    return this.http.post<ApiResponse<ToppingBase>>(`${this.url}/detect-topping`, {filename}, this.httpOptions)
       .pipe(map(body => plainToClass(ToppingBase, body.data)));
   }
 }

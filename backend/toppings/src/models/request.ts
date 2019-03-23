@@ -73,5 +73,8 @@ export class UpdateToppingBody {
   image: ImageDataUrl;
 }
 
-export class DetectToppingBody extends ImageDataUrl {
+export class DetectToppingBody {
+  @IsDefined()
+  @Matches(imageFileNameRegExp)
+  filename: string;
 }

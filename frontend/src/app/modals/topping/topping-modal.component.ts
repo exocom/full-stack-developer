@@ -5,11 +5,15 @@ import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {PizzaStoreService} from '../../services/pizza-store.service';
 import {getMIMEType} from 'mim';
 import {ImageMimeTypes, ImageUpload} from '../../models/images';
-import {switchMap} from 'rxjs/operators';
+import {switchMap, tap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
 import {randomString} from '../../common/string';
 
-interface Loading { toppingValidation: boolean; toppingImage: boolean; toppingUpdate: boolean; }
+interface Loading {
+  toppingValidation: boolean;
+  toppingImage: boolean;
+  toppingUpdate: boolean;
+}
 
 @Component({
   selector: 'app-topping',
@@ -73,41 +77,30 @@ export class ToppingModalComponent implements OnInit {
 
     this.pizzaStoreService.createToppingImageSignedUrl({filename, mimeType})
       .pipe(
-        switchMap((signedUrl) => this.pizzaStoreService.uploadToppingImage({signedUrl, mimeType}, {file, base64str})),
-        switchMap((url) => {
-          console.log(url);
-          debugger;
-          // TODO : get url from aws payload?
-          return url;
-          // this.toppingFormGroup.patchValue({image: {filename, url}});
-        })
-        /*
-        .subscribe((toppingBase) => {
-  const {name, type} = toppingBase;
-  this.toppingFormGroup.patchValue({name, type});
-
-  this.loading.toppingValidation = false;
-}, async (res) => {
-  const toast = await this.toastCtrl.create({
-    color: 'danger',
-    cssClass: 'shocked',
-    message: `Is that even food!\n Sorry I can't help.`,
-    showCloseButton: true
-  });
-  await toast.present();
-  this.loading.toppingValidation = false;
-});
-         */
-        // })
+        switchMap((signedUrl) => {
+          return this.pizzaStoreService.uploadToppingImage({signedUrl, mimeType}, {file, base64str}).pipe(
+            tap(() => {
+              this.loading.toppingImage = false;
+              this.loading.toppingValidation = true;
+              const url = signedUrl.replace(/\?.*$/, '');
+              this.toppingFormGroup.patchValue({image: {filename, url}});
+            })
+          );
+        }),
+        switchMap(() => this.pizzaStoreService.detectTopping(filename))
       )
-      .subscribe(() => {
+      .subscribe((toppingBase) => {
+        const {name, type} = toppingBase;
+        this.toppingFormGroup.patchValue({name, type});
+
         this.loading.toppingImage = false;
+        this.loading.toppingValidation = true;
       }, async (res) => {
         const message = res && res.error && res.error.error && res.error.error.message || 'Important message goes here!';
         const toast = await this.toastCtrl.create({
           color: 'danger',
           cssClass: 'shocked',
-          message: `Something went wrong!\n${message}`,
+          message: res && res.statusCode === 404 ? 'Is that even food!\n Sorry I can\'t help.' : `Something went wrong!\n${message}`,
           showCloseButton: true
         });
         await toast.present();
