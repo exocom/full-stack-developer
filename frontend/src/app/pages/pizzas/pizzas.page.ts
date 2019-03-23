@@ -23,7 +23,7 @@ export class PizzasPage implements OnInit {
   async removePizza(pizza: Pizza) {
     const confirm = await this.alertController.create({
       header: 'Confirm',
-      message: 'Are you sure you want to remove this topping?',
+      message: 'Are you sure you want to remove this pizza?',
       buttons: [
         {
           text: 'Cancel',
@@ -34,10 +34,21 @@ export class PizzasPage implements OnInit {
           text: 'Okay',
           handler: () => {
             this.pizzaStoreService.removePizza({pizza}).subscribe(async () => {
-              const toast = await this.toastCtrl.create({color: 'secondary', message: 'Your topping has been removed.', duration: 3000});
+              const toast = await this.toastCtrl.create({
+                color: 'secondary',
+                cssClass: 'cloud-crumbs',
+                message: 'Om Nom Nom!\n Your pizza has been removed.',
+                showCloseButton: true,
+                duration: 3000
+              });
               await toast.present();
             }, async () => {
-              const toast = await this.toastCtrl.create({color: 'danger', message: 'Unable to remove your topping.', duration: 3000});
+              const toast = await this.toastCtrl.create({
+                color: 'danger',
+                cssClass: 'shocked',
+                message: 'Something went wrong!\n Unable to remove your pizza.',
+                showCloseButton: true
+              });
               await toast.present();
             });
           }

@@ -5,7 +5,7 @@ import {ApiResponse} from './models/api';
 import {map} from 'rxjs/operators';
 import {Topping, ToppingBase} from './models/topping';
 import {plainToClass} from 'class-transformer';
-import {CreateToppingBody} from './models/request';
+import {CreateToppingBody, UpdateToppingBody} from './models/request';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,11 @@ export class ToppingsService {
 
   createTopping(createToppingBody: CreateToppingBody): Observable<Topping> {
     return this.http.post<ApiResponse<Topping>>(`${this.url}/toppings`, createToppingBody, this.httpOptions)
+      .pipe(map(body => plainToClass(Topping, body.data)));
+  }
+
+  updateTopping(updateToppingBody: UpdateToppingBody): Observable<Topping> {
+    return this.http.put<ApiResponse<Topping>>(`${this.url}/toppings/${updateToppingBody.id}`, updateToppingBody, this.httpOptions)
       .pipe(map(body => plainToClass(Topping, body.data)));
   }
 

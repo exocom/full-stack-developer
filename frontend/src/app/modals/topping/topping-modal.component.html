@@ -8,10 +8,10 @@
 </ion-header>
 
 <ion-content scrollY="false">
-  <form [formGroup]="toppingFormGroup">
+  <form [formGroup]="toppingFormGroup" flex-row>
     <!--TODO ngIf no photo-->
-    <div formGroupName="image">
-      <ion-img *ngIf="dataUrlFormControl.value else noImage" [src]="dataUrlFormControl.value"></ion-img>
+    <div formGroupName="image" class="image-group">
+      <ion-img class="a" *ngIf="dataUrlFormControl.value else noImage" [src]="dataUrlFormControl.value"></ion-img>
 
       <ng-template #noImage>
         <app-camera-pad *ngIf="!toppingDataUrl" (photoCaptured)="processPhoto($event)"></app-camera-pad>
@@ -41,5 +41,9 @@
         </div>
       </ng-container>
     </div>-->
+    <div flex-row style="flex: 1; height: 100%;">&nbsp;</div>
+    <ion-progress-bar *ngIf="loading.toppingUpdate" type="indeterminate" color="tertiary"></ion-progress-bar>
+    <ion-button color="success" size="full" (click)="save()" [disabled]="loading.toppingUpdate">Save</ion-button>
   </form>
 </ion-content>
+

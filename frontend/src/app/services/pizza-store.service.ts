@@ -3,7 +3,7 @@ import {ToppingsService} from './contract/toppings.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Topping, ToppingBase} from './contract/models/topping';
 import {exhaustMap, shareReplay, tap} from 'rxjs/operators';
-import {CreatePizzaBody, CreateToppingBody} from './contract/models/request';
+import {CreatePizzaBody, CreateToppingBody, UpdateToppingBody} from './contract/models/request';
 import {Pizza} from './contract/models/pizza';
 import {PizzasService} from './contract/pizzas.service';
 
@@ -26,6 +26,12 @@ export class PizzaStoreService {
 
   createTopping({topping}: { topping: CreateToppingBody }): Observable<Topping> {
     return this.toppingsService.createTopping(topping).pipe(
+      tap(() => this._refreshToppings.next(true))
+    );
+  }
+
+  updateTopping({topping}: { topping: UpdateToppingBody }): Observable<Topping> {
+    return this.toppingsService.updateTopping(topping).pipe(
       tap(() => this._refreshToppings.next(true))
     );
   }

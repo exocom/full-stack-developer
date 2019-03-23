@@ -55,13 +55,35 @@ ion-list-header, ion-badge {
   overflow: hidden;
 }
 
-ion-toast.annoyed {
-  --ion-color-base: var(--ion-color-danger, #f04141) url('/assets/pizza/annoyed.svg') 80% center/55px 55px no-repeat !important;
+ion-toast {
+  &.annoyed {
+    --ion-color-base: var(--ion-color-danger, #f04141) url('/assets/pizza/annoyed.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.crumbs {
+    --ion-color-base: var(--ion-color-secondary, #0cd1e8) url('/assets/pizza/crumbs.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.cloud-crumbs {
+    --ion-color-base: var(--ion-color-secondary, #0cd1e8) url('/assets/clouds/crumbs.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.wink {
+    --ion-color-base: var(--ion-color-success, #10dc60) url('/assets/pizza/wink.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.shocked {
+    --ion-color-base: var(--ion-color-danger, #f04141) url('/assets/pizza/shocked.svg') 80% center/55px 55px no-repeat !important;
+  }
 }
 
 .toast-message {
   -webkit-padding-start: 44px !important;
   padding-inline-start: 44px !important;
+}
+
+.scanning {
+  position: relative;
 }
 
 .scanning:after {

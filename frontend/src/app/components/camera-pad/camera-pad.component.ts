@@ -99,7 +99,7 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const {width, height} = this.videoTrack.getSettings();
     const isPortrait = window.innerHeight > window.innerWidth;
-    const isMobileOrTablet = true;
+    const isMobileOrTablet = false;
 
     const w = isMobileOrTablet && isPortrait ? height : width;
     const h = isMobileOrTablet && isPortrait ? width : height;

@@ -29,8 +29,16 @@ export class ToppingsPage implements OnInit {
               private toastCtrl: ToastController) {
   }
 
-  ngOnInit() {
-    setTimeout(() => this.createTopping(), 200);
+  async ngOnInit() {
+    // setTimeout(() => this.createTopping(), 200);
+
+    // const toast = await this.toastCtrl.create({
+    //   color: 'secondary',
+    //   cssClass: 'cloud-crumbs',
+    //   message: 'Om Nom Nom!\n Your pizza has been removed.',
+    //   showCloseButton: true
+    // });
+    // await toast.present();
   }
 
   async removeTopping(topping: Topping) {
@@ -47,10 +55,21 @@ export class ToppingsPage implements OnInit {
           text: 'Okay',
           handler: () => {
             this.pizzaStoreService.removeTopping({topping}).subscribe(async () => {
-              const toast = await this.toastCtrl.create({color: 'secondary', message: 'Your topping has been removed.', duration: 3000});
+              const toast = await this.toastCtrl.create({
+                color: 'secondary',
+                cssClass: 'crumbs',
+                message: 'Om Nom Nom!\n Your topping has been removed.',
+                showCloseButton: true,
+                duration: 3000
+              });
               await toast.present();
             }, async () => {
-              const toast = await this.toastCtrl.create({color: 'danger', message: 'Unable to remove your topping.', duration: 3000});
+              const toast = await this.toastCtrl.create({
+                color: 'danger',
+                cssClass: 'shocked',
+                message: 'Something went wrong!\n Unable to remove your topping.',
+                showCloseButton: true
+              });
               await toast.present();
             });
           }

@@ -12,7 +12,7 @@ import {PizzaStoreService} from '../../services/pizza-store.service';
 export class ToppingModalComponent implements OnInit {
   @Input() topping: Topping;
 
-  loading: { toppingValidation: boolean; } = {toppingValidation: false};
+  loading: { toppingValidation: boolean; toppingUpdate: boolean; } = {toppingValidation: false, toppingUpdate: false};
 
   objectKeys = Object.keys;
   toppingTypes = ToppingType;
@@ -37,7 +37,7 @@ export class ToppingModalComponent implements OnInit {
               public toastCtrl: ToastController) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
   }
 
   closeModal() {
@@ -56,7 +56,8 @@ export class ToppingModalComponent implements OnInit {
     }, async (res) => {
       const toast = await this.toastCtrl.create({
         color: 'danger',
-        message: 'That is not food! Please take another photo.',
+        cssClass: 'annoyed',
+        message: 'That is not food!\n Please take another photo.',
         showCloseButton: true
       });
       await toast.present();
@@ -65,13 +66,40 @@ export class ToppingModalComponent implements OnInit {
     });
   }
 
-  save() {
-    // if (this.signaturePadDirective.signaturePad.isEmpty()) {
-    //   return this.modalController.dismiss(null);
-    // }
-    // // TODO : base64decode SVG/XML then create HTML svg element and trim whitespace. baseEncode and return that mother!
-    // // https://gist.github.com/john-doherty/2ad94360771902b16f459f590b833d44
-    // const base64imageData = this.signaturePadDirective.cropSignatureCanvas().toDataURL('image/png');
-    // return this.modalController.dismiss(base64imageData);
+  async save() {
+    this.loading.toppingUpdate = false;
+    if (this.toppingFormGroup.invalid) {
+      const toast = await this.toastCtrl.create({
+        color: 'danger',
+        cssClass: 'annoyed',
+        message: 'Form is invalid!\nPlease correct issues and try again.',
+        showCloseButton: true
+      });
+      return toast.present();
+    }
+    this.loading.toppingUpdate = true;
+    const topping = this.toppingFormGroup.value;
+    const obs = topping.id ? this.pizzaStoreService.updateTopping({topping}) : this.pizzaStoreService.createTopping({topping});
+    obs.subscribe(async () => {
+      const toast = await this.toastCtrl.create({
+        color: 'success',
+        cssClass: 'wink',
+        message: `Nice job!\n The topping has been ${topping.id ? 'updated' : 'added'}!`,
+        showCloseButton: true,
+        duration: 3000
+      });
+      await toast.present();
+      await this.closeModal();
+      this.loading.toppingUpdate = false;
+    }, async () => {
+      const toast = await this.toastCtrl.create({
+        color: 'danger',
+        cssClass: 'shocked',
+        message: 'Something went wrong!\nImportant message goes here!',
+        showCloseButton: true
+      });
+      await toast.present();
+      this.loading.toppingUpdate = false;
+    });
   }
 }
