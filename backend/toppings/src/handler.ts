@@ -6,15 +6,26 @@ import {
   CreateToppingBody,
   dataUrlRegExp,
   DeleteToppingPathParameters,
+  DetectToppingBody, ImageDataUrl,
   UpdateToppingBody,
   UpdateToppingPathParameters
 } from './models/request';
 import {MongoClient} from 'mongodb';
-import {S3} from 'aws-sdk';
+import {Rekognition, S3} from 'aws-sdk';
 import {MongoTopping} from './models/mongo-topping';
+import {
+  cheeseRegExp,
+  meatRegExp,
+  sauceRegExp,
+  seasoningRegExp,
+  ToppingBase,
+  ToppingType,
+  toppingTypeRegExp
+} from './models/topping';
 
-const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET} = process.env;
+const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET, AWS_REGION} = process.env;
 const s3 = new S3();
+const rekognition = new Rekognition({region: AWS_REGION || 'us-west-2'});
 const apiGatewayUtil = new ApiGatewayUtil();
 
 export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping) => {
@@ -155,4 +166,88 @@ export const updateTopping: ApiGatewayHandler = async (event) => {
 
   const topping = mapMongoToppingToTopping(value);
   return apiGatewayUtil.sendJson({statusCode: lastErrorObject.updatedExisting ? 200 : 201, body: {data: topping}});
+};
+
+export const detectTopping: ApiGatewayHandler = async (event) => {
+  const body = deserialize(DetectToppingBody, event.body);
+  const bodyErrors = await validate(body) || [];
+  if (bodyErrors.length) {
+    const validation = [...bodyErrors];
+    const error = {
+      type: 'Validation',
+      message: 'Failed validation',
+      validation
+    };
+    return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
+  }
+
+  const {dataUrl} = body;
+  const matches = dataUrl.match(dataUrlRegExp);
+  const [all, contentType, ext, base64data] = matches;
+
+    const result = await rekognition.detectLabels({
+      Image: {Bytes: Buffer.from(base64data, 'base64')}
+    }).promise().catch(err => {
+      console.log('ERROR', err);
+    });
+
+    if (!(result && result.Labels)) {
+      return apiGatewayUtil.sendJson({statusCode: 404});
+    }
+
+    const shoe = result.Labels.find(l => l.Name === 'Shoe');
+    if (shoe) {
+      const toppingBase: ToppingBase = {
+        name: 'Shoe',
+        type: ToppingType.Seasoning
+      };
+      return apiGatewayUtil.sendJson({statusCode: 200, body: {data: toppingBase}});
+    }
+
+    const food = result.Labels.find(l => l.Name === 'Food');
+    if (!food) {
+      return apiGatewayUtil.sendJson({statusCode: 404});
+    }
+    const [bestGuess] = result.Labels.filter(l => l.Name !== 'Food');
+    let toppingType: ToppingType = null;
+    for (const label of result.Labels) {
+      if (toppingTypeRegExp.test(label.Name)) {
+        toppingType = label.Name as ToppingType;
+        break;
+      }
+    }
+    if (!toppingType) { // Getting desperate!
+      for (const label of result.Labels) {
+        if (cheeseRegExp.test(label.Name)) {
+          toppingType = ToppingType.Cheese;
+          break;
+        }
+        if (sauceRegExp.test(label.Name)) {
+          toppingType = ToppingType.Sauce;
+          break;
+        }
+        if (meatRegExp.test(label.Name)) {
+          toppingType = ToppingType.Meat;
+          break;
+        }
+        if (seasoningRegExp.test(label.Name)) {
+          toppingType = ToppingType.Seasoning;
+          break;
+        }
+      }
+    }
+
+    const toppingBase: ToppingBase = {
+      name: bestGuess.Name,
+      type: ToppingType.Seasoning
+    };
+    return apiGatewayUtil.sendJson({statusCode: 200, body: {data: toppingBase}});
+
+  // } catch (e) {
+  //   const error = {
+  //     type: 'Upload Failure',
+  //     message: 'Unable to process the image.'
+  //   };
+  //   return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
+  // }
 };

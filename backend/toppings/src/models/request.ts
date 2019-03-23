@@ -3,7 +3,7 @@ import {Transform, Type} from 'class-transformer';
 import {ToppingType} from './topping';
 import {ObjectId} from 'mongodb';
 
-export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;
+export const dataUrlRegExp = /^data:(.*?\/(.*?));base64,(.*$)/;
 
 const enumCustomErrorMessage: ValidationOptions = {
   message: ({property, constraints}) => {
@@ -39,7 +39,6 @@ export class DeleteToppingPathParameters {
   toppingId: ObjectId;
 }
 
-
 export class UpdateToppingPathParameters {
   @Transform(value => ObjectId(value), {toClassOnly: true})
   toppingId: ObjectId;
@@ -62,4 +61,7 @@ export class UpdateToppingBody {
   @ValidateNested()
   @Type(() => ImageDataUrl)
   image: ImageDataUrl;
+}
+
+export class DetectToppingBody extends ImageDataUrl {
 }

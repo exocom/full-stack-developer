@@ -6,6 +6,7 @@ const {ObjectId} = require('mongodb');
 const mongoUnit = require('mongo-unit');
 const awsMock = require('aws-sdk-mock');
 const {StandaloneLocalDevServer} = require('@kalarrs/serverless-local-dev-server/src/StandaloneLocalDevServer');
+const {readFile} = require('fs').promises;
 
 const serverlessLocalServer = new StandaloneLocalDevServer({
   projectPath: join(__dirname, '../'),
@@ -445,7 +446,7 @@ describe('toppings', () => {
     it('should return an updated topping', async () => {
       const {updateTopping} = handler;
       const {body, statusCode} = await updateTopping({body: JSON.stringify(requestBody), pathParameters: {toppingId}});
-      //assert.equal(statusCode, 201);
+      assert.equal(statusCode, 201);
       assert.isString(body);
 
       const {data} = JSON.parse(body);
@@ -456,6 +457,48 @@ describe('toppings', () => {
         bucket: process.env.TOPPINGS_S3_BUCKET,
         key: `${name}\.${imageExt}`
       }));
+    });
+  });
+
+  describe('detect a cheese topping from an image', () => {
+    const imageName = 'cheese.jpg';
+    let dataUrl;
+
+    before(async () => {
+      const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+      dataUrl = `data:image/jpeg;base64,${base64}`;
+    });
+
+    it('should return a cheese topping', async () => {
+      const requestBody = {dataUrl};
+      const {detectTopping} = handler;
+      const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 200);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.equal(data.name, 'Cheese');
+    });
+  });
+
+  describe('detect a cheese topping from an image', () => {
+    const imageName = 'cheese2.jpg';
+    let dataUrl;
+
+    before(async () => {
+      const base64 = await readFile(`${__dirname}/images/${imageName}`, 'base64');
+      dataUrl = `data:image/jpeg;base64,${base64}`;
+    });
+
+    it('should return a cheese topping', async () => {
+      const requestBody = {dataUrl};
+      const {detectTopping} = handler;
+      const {body, statusCode} = await detectTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 200);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.equal(data.name, 'Cheese');
     });
   });
 });
