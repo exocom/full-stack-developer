@@ -108,7 +108,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 
   try {
     await s3.copyObject({
-      CopySource: `temp/${TOPPINGS_S3_BUCKET}/${image.filename}`,
+      CopySource: `${TOPPINGS_S3_BUCKET}/temp/${image.filename}`,
       Bucket: TOPPINGS_S3_BUCKET,
       Key: `${name}.${ext}`,
       ACL: 'public-read'
