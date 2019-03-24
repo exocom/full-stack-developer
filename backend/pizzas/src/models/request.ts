@@ -1,16 +1,24 @@
-import {IsDefined, IsEnum, MaxLength, MinLength, ValidateNested, ValidationOptions} from 'class-validator';
-import {Transform} from 'class-transformer';
-import {ObjectId} from 'mongodb';
+import {IsDefined, IsEnum, Matches, MaxLength, MinLength, ValidateNested} from 'class-validator';
+import {Transform, Type} from 'class-transformer';
 import {CrustType, PizzaSize} from './pizza';
-import {UpdateToppingBody} from '../../../toppings/src/models/request';
+import {ObjectId} from 'mongodb';
+import {enumCustomErrorMessage} from '../../../common/src/validation';
+import {imageFileNameRegExp, ImageMimeTypes} from '../../../common/src/image';
+import {ToppingImageRequest} from '../../../toppings/src/models/request';
 
-const enumCustomErrorMessage: ValidationOptions = {
-  message: ({property, constraints}) => {
-    const [toppingTypeEnum] = constraints;
-    const values = Object.values(toppingTypeEnum).join(', ');
-    return `${property} must be a valid enum value: ${values}`;
-  }
-};
+export class PizzaImageRequest {
+  @IsDefined()
+  @Matches(imageFileNameRegExp)
+  filename: string;
+}
+
+export class UploadPizzaImageBody {
+  @Matches(imageFileNameRegExp)
+  filename: string;
+
+  @IsEnum(ImageMimeTypes, enumCustomErrorMessage)
+  contentType: ImageMimeTypes;
+}
 
 export class CreatePizzaBody {
   @IsDefined()
@@ -27,15 +35,16 @@ export class CreatePizzaBody {
   @IsDefined()
   price: number;
 
+  @IsDefined()
   @ValidateNested()
-  toppings: Array<UpdateToppingBody>;
+  @Type(() => ToppingImageRequest)
+  image: ToppingImageRequest;
 }
 
 export class DeletePizzaPathParameters {
   @Transform(value => ObjectId(value), {toClassOnly: true})
   pizzaId: ObjectId;
 }
-
 
 export class UpdatePizzaPathParameters {
   @Transform(value => ObjectId(value), {toClassOnly: true})
@@ -61,6 +70,8 @@ export class UpdatePizzaBody {
   @IsDefined()
   price: number;
 
+  @IsDefined()
   @ValidateNested()
-  toppings: Array<UpdateToppingBody>;
+  @Type(() => ToppingImageRequest)
+  image: ToppingImageRequest;
 }

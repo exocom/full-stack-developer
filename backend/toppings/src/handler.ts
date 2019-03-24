@@ -5,7 +5,7 @@ import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
 import {
   CreateToppingBody,
   DeleteToppingPathParameters,
-  DetectToppingBody, imageFileNameRegExp,
+  DetectToppingBody,
   UpdateToppingBody,
   UpdateToppingPathParameters,
   UploadToppingImageBody
@@ -23,6 +23,7 @@ import {
   ToppingType,
   toppingTypeRegExp
 } from './models/topping';
+import {imageFileNameRegExp} from '../../common/src/image';
 
 export const aws = AWS; // Used for mocking AWS in tests.
 

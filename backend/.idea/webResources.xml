@@ -10,6 +10,7 @@
             <path value="file://$PROJECT_DIR$/layers/node-modules" />
             <path value="file://$PROJECT_DIR$/pizzas" />
             <path value="file://$PROJECT_DIR$/pizzas/src" />
+            <path value="file://$PROJECT_DIR$/common" />
           </resourceRoots>
         </entryData>
       </entry>
