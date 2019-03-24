@@ -34,7 +34,7 @@ export class Defaults {
     name: null,
     crust: null,
     size: null,
-    price: null,
+    price: 0,
     image: {
       filename: null,
       url: null

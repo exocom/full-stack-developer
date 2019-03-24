@@ -75,7 +75,7 @@ export class PizzaStoreService {
     );
   }
 
-  updatePizza({pizza}: { pizza: UpdatePizzaBody }): Observable<Topping> {
+  updatePizza({pizza}: { pizza: UpdatePizzaBody }): Observable<Pizza> {
     return this.pizzasService.updatePizza(pizza).pipe(
       tap(() => this._refreshPizzas.next(true))
     );

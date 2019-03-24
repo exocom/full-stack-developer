@@ -11,6 +11,7 @@ import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
 import {HttpClientModule} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgxMaskModule} from 'ngx-mask';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,6 +21,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     IonicModule.forRoot({mode: 'ios'}),
+    NgxMaskModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot()
   ],
   providers: [

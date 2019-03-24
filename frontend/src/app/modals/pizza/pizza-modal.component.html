@@ -1,3 +1,62 @@
-<p>
-  pizza-modal works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Pizza Editor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content scrollY="false">
+  <form [formGroup]="pizzaFormGroup" flex-row>
+    <div flex flex-grow [class.fix-loading-bottom]="!loading.pizzaImage">
+      <ion-item-sliding lines="none" *ngIf="urlFormControl.value else noImage">
+        <ion-item no-padding no-margin flex>
+          <ion-img [src]="urlFormControl.value" [class.scanning]="loading.pizzaValidation"></ion-img>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="removeImage()">
+            <ion-icon name="trash" size="large"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+      <ng-template #noImage>
+        <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
+      </ng-template>
+    </div>
+    <ion-progress-bar *ngIf="loading.pizzaImage" type="indeterminate" color="tertiary"></ion-progress-bar>
+
+    <ion-item>
+      <ion-label position="stacked">Name</ion-label>
+      <ion-input formControlName="name" placeholder="e.g. Supreme Supreme" clearInput required></ion-input>
+    </ion-item>
+
+    <ion-item [class.fix-loading-bottom]="!loading.pizzaUpdate">
+      <ion-label position="stacked">Crust</ion-label>
+      <ion-select formControlName="crust" placeholder="Choose..." required>
+        <ion-select-option *ngFor="let key of objectKeys(crustTypes)"
+                           [value]="crustTypes[key]">{{key}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item [class.fix-loading-bottom]="!loading.pizzaUpdate">
+      <ion-label position="stacked">Type</ion-label>
+      <ion-select formControlName="size" placeholder="Choose..." required>
+        <ion-select-option *ngFor="let key of objectKeys(pizzaSizes)"
+                           [value]="pizzaSizes[key]">{{key}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Price</ion-label>
+      <ion-input formControlName="price" placeholder="e.g. $15.00"
+                 clearInput required></ion-input>
+    </ion-item>
+
+    <ion-progress-bar *ngIf="loading.pizzaUpdate" type="indeterminate" color="tertiary"></ion-progress-bar>
+    <ion-button color="success" size="full" (click)="save()" [disabled]="loading.pizzaUpdate">Save</ion-button>
+  </form>
+</ion-content>
+
