@@ -6,7 +6,6 @@ import {ObjectId} from 'mongodb';
 export const dataUrlRegExp = /^data:(.*?\/(.*?));base64,(.*$)/;
 
 export const imageFileNameRegExp = /^[-\w^&'@{}[\],$=!#().%+~].*?\.(gif|jpg|jpeg|tiff|png)$/i;
-export const tempToppingImageRegExp = /^temp\/(.*?.(gif|jpg|jpeg|tiff|png))$/i;
 
 const enumCustomErrorMessage: ValidationOptions = {
   message: ({property, constraints}) => {
@@ -19,7 +18,6 @@ const enumCustomErrorMessage: ValidationOptions = {
 export class ToppingImageRequest {
   @IsDefined()
   @Matches(imageFileNameRegExp)
-  @Matches(tempToppingImageRegExp)
   filename: string;
 }
 

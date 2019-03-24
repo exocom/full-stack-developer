@@ -6,7 +6,7 @@ import {
   CreateToppingBody,
   dataUrlRegExp,
   DeleteToppingPathParameters,
-  DetectToppingBody, tempToppingImageRegExp,
+  DetectToppingBody, imageFileNameRegExp,
   UpdateToppingBody,
   UpdateToppingPathParameters,
   UploadToppingImageBody
@@ -68,15 +68,6 @@ export const createToppingImageSingedUrl: ApiGatewayHandler = async (event) => {
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: signedUrl}});
 };
 
-export const createToppingZ = async () => {
-
-  const r = s3.putObject({Bucket: '1', Key: 'a', Body: new Buffer('')}, (err, data) => {
-    console.log(err, data);
-  });
-  return new Promise(() => {
-  });
-}
-
 export const createTopping: ApiGatewayHandler = async (event) => {
   const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
@@ -103,7 +94,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
   }
 
-  const [match, filename, ext] = image.filename.match(tempToppingImageRegExp);
+  const [match, ext] = image.filename.match(imageFileNameRegExp);
   /*
   const existingImage = await s3.headObject({Bucket: TOPPINGS_S3_BUCKET, Key: filename}).promise().catch(e => null);
   if (existingTopping) {
@@ -119,7 +110,7 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     await s3.copyObject({
       CopySource: `${TOPPINGS_S3_BUCKET}/${image.filename}`,
       Bucket: TOPPINGS_S3_BUCKET,
-      Key: `${name}.${ext}`,
+      Key: `temp/${name}.${ext}`,
       ACL: 'public-read'
     }).promise();
     await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();

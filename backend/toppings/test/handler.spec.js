@@ -79,7 +79,7 @@ describe('toppings', () => {
 
   describe('create a topping', () => {
     const name = 'pepperoni';
-    const filename = 'temp/pepperoni.png';
+    const filename = 'pepperoni.png';
     const requestBody = {
       name,
       type: ToppingType.Meat,
