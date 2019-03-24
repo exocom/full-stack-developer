@@ -21,20 +21,23 @@
             <ion-badge *ngIf="showRemoveControl" color="danger" (click)="removePizza(pizza)">
               <ion-icon name="trash"></ion-icon>
             </ion-badge>
-            <p>
-              <ion-text>{{pizza.name}}</ion-text>
-            </p>
+            <ion-card-content class="ion-text-left">
+              <h2>
+                <ion-text color="primary">{{pizza.name}}</ion-text>
+              </h2>
+              <ion-text>${{pizza.price || 0}}</ion-text>
+            </ion-card-content>
 
             <ion-fab vertical="bottom" horizontal="end">
-              <ion-fab-button color="secondary">
+              <ion-fab-button size="small" color="secondary">
                 <ion-icon name="md-more"></ion-icon>
               </ion-fab-button>
 
               <ion-fab-list side="top">
-                <ion-fab-button color="primary" (click)="editPizza(pizza)">
+                <ion-fab-button size="small" color="primary" (click)="editPizza(pizza)">
                   <ion-icon name="create" class="icon-custom-size"></ion-icon>
                 </ion-fab-button>
-                <ion-fab-button color="danger" (click)="removePizza(pizza)">
+                <ion-fab-button size="small" color="danger" (click)="removePizza(pizza)">
                   <ion-icon name="trash" size="large"></ion-icon>
                 </ion-fab-button>
               </ion-fab-list>

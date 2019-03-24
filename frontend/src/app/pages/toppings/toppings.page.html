@@ -8,12 +8,12 @@
       Tasty Pie
       <ion-badge *ngIf="toppings$ | async as toppings" color="primary">{{toppings.length || 0}}</ion-badge>
     </ion-title>
-      <ion-button slot="end" no-margin [disabled]="displayMode === 'grid'" (click)="setDisplayMode('grid')">
-        <ion-icon name="md-apps" size="large"></ion-icon>
-      </ion-button>
-      <ion-button slot="end" no-margin [disabled]="displayMode === 'list'" (click)="setDisplayMode('list')">
-        <ion-icon name="list" size="large"></ion-icon>
-      </ion-button>
+    <ion-button slot="end" no-margin [disabled]="displayMode === 'grid'" (click)="setDisplayMode('grid')">
+      <ion-icon name="md-apps" size="large"></ion-icon>
+    </ion-button>
+    <ion-button slot="end" no-margin [disabled]="displayMode === 'list'" (click)="setDisplayMode('list')">
+      <ion-icon name="list" size="large"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
@@ -34,20 +34,22 @@
                   <ion-badge *ngIf="showRemoveControl" color="danger" (click)="removeTopping(topping)">
                     <ion-icon name="trash"></ion-icon>
                   </ion-badge>
-                  <p>
-                    <ion-text>{{topping.name}}</ion-text>
-                  </p>
+                  <ion-card-content class="ion-text-left">
+                    <h2>
+                      <ion-text color="primary">{{topping.name}}</ion-text>
+                    </h2>
+                  </ion-card-content>
 
                   <ion-fab vertical="bottom" horizontal="end">
-                    <ion-fab-button color="secondary">
+                    <ion-fab-button size="small" color="secondary">
                       <ion-icon name="md-more"></ion-icon>
                     </ion-fab-button>
 
                     <ion-fab-list side="top">
-                      <ion-fab-button color="primary" (click)="editTopping(topping)">
+                      <ion-fab-button size="small" color="primary" (click)="editTopping(topping)">
                         <ion-icon name="create" class="icon-custom-size"></ion-icon>
                       </ion-fab-button>
-                      <ion-fab-button color="danger" (click)="removeTopping(topping)">
+                      <ion-fab-button size="small" color="danger" (click)="removeTopping(topping)">
                         <ion-icon name="trash" size="large"></ion-icon>
                       </ion-fab-button>
                     </ion-fab-list>
