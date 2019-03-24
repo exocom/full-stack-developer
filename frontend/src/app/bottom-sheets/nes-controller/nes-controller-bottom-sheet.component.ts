@@ -62,13 +62,13 @@ export class NesControllerBottomSheetComponent {
     let i = 0;
     while (true) {
       const msg = yield;
-      if (i === (seq.length - 1)) {
-        return true;
-      }
-      if (msg === seq[i]) {
-        i++;
-      } else {
+      if (msg !== seq[i]) {
         i = 0;
+      } else {
+        i++;
+      }
+      if (i === seq.length) {
+        return true;
       }
     }
   }
@@ -94,6 +94,7 @@ export class NesControllerBottomSheetComponent {
       if (result.done && result.value) {
         this.bottomSheetRef.dismiss();
         await this.reward(code);
+        break;
       }
     }
   }
