@@ -1,27 +1,30 @@
 <ion-app>
   <ion-menu contentId="content">
-    <ion-content>
-      <ion-list>
-        <!--
-        <ion-menu-toggle auto-hide="false">
-          <ion-item routerLink="/home" routerLinkActive #rlaHome="routerLinkActive">
-            <ion-label [color]="rlaHome.isActive ? 'primary' : ''">Home</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-        -->
-        <ion-menu-toggle auto-hide="false">
-          <ion-item routerLink="/toppings" routerLinkActive #rlaToppings="routerLinkActive">
-            <ion-icon slot="start" src="/assets/harvest.svg"></ion-icon>
-            <ion-label [color]="rlaToppings.isActive ? 'primary' : ''">Toppings</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-        <ion-menu-toggle auto-hide="false">
-          <ion-item routerLink="/pizzas" routerLinkActive #rlaPizzas="routerLinkActive">
-            <ion-icon slot="start" src="/assets/pizza.svg"></ion-icon>
-            <ion-label [color]="rlaPizzas.isActive ? 'primary' : ''">Pizza Pies</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-      </ion-list>
+    <ion-content scrollY="false" scrollX="false">
+      <div flex-row style="height: 100vh">
+        <ion-list>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item routerLink="/toppings" routerLinkActive #rlaToppings="routerLinkActive">
+              <ion-icon slot="start" src="/assets/harvest.svg"></ion-icon>
+              <ion-label [color]="rlaToppings.isActive ? 'primary' : ''">Toppings</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item routerLink="/pizzas" routerLinkActive #rlaPizzas="routerLinkActive">
+              <ion-icon slot="start" src="/assets/pizza.svg"></ion-icon>
+              <ion-label [color]="rlaPizzas.isActive ? 'primary' : ''">Pizza Pies</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+        <div flex-grow style="height: 100%;">&nbsp;</div>
+        <div class="ion-align-items-center ion-justify-content-center ion-text-center">
+          <div class="ion-padding">
+            <h4>MADE WITH <ion-text style="color: hotpink;">LOVE</ion-text></h4>
+            <ion-menu-toggle style="outline: none;"><ion-img src="/assets/logo.png" style="height: 40px; outline: none;" routerLink="/home"></ion-img></ion-menu-toggle>
+            <p no-margin>While eating<br>Pizza!</p>
+          </div>
+        </div>
+      </div>
     </ion-content>
   </ion-menu>
   <ion-router-outlet id="content"></ion-router-outlet>
