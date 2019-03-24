@@ -51,8 +51,7 @@
 
     <ion-item>
       <ion-label position="stacked">Price</ion-label>
-      <ion-input formControlName="price" placeholder="e.g. $15.00"
-                 clearInput required></ion-input>
+      <ion-input formControlName="price" placeholder="e.g. 12.57" mask="0*.00" required></ion-input>
     </ion-item>
 
     <ion-progress-bar *ngIf="loading.pizzaUpdate" type="indeterminate" color="tertiary"></ion-progress-bar>

@@ -1,10 +1,11 @@
 import {NgModule} from '@angular/core';
-import {CommonModule, CurrencyPipe} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {PizzaModalComponent} from './pizza-modal.component';
 import {IonicModule} from '@ionic/angular';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FileUploadZoneModule} from '../../components/file-upload-zone/file-upload-zone.module';
 import {CameraPadModule} from '../../components/camera-pad/camera-pad.module';
+import {NgxMaskIonicModule} from 'ngx-mask-ionic';
 
 @NgModule({
   declarations: [PizzaModalComponent],
@@ -12,6 +13,7 @@ import {CameraPadModule} from '../../components/camera-pad/camera-pad.module';
   imports: [
     CommonModule,
     IonicModule,
+    NgxMaskIonicModule,
     FormsModule,
     ReactiveFormsModule,
     FileUploadZoneModule,

@@ -1,15 +1,13 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {CrustType, Defaults, Pizza, PizzaSize} from '../../services/contract/models/pizza';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ModalController, NavParams, ToastController} from '@ionic/angular';
 import {PizzaStoreService} from '../../services/pizza-store.service';
 import {getMIMEType} from 'mim';
 import {ImageMimeTypes, ImageUpload} from '../../models/images';
-import {debounceTime, switchMap, tap} from 'rxjs/operators';
+import {switchMap, tap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
 import {randomString} from '../../common/string';
-import {CurrencyPipe} from '@angular/common';
-import {Subscription} from 'rxjs';
 
 interface Loading {
   pizzaValidation: boolean;
@@ -17,14 +15,12 @@ interface Loading {
   pizzaUpdate: boolean;
 }
 
-const numberPattern = '^[0-9.,]+$';
-
 @Component({
   selector: 'app-pizza-modal',
   templateUrl: './pizza-modal.component.html',
   styleUrls: ['./pizza-modal.component.scss']
 })
-export class PizzaModalComponent implements OnInit, OnDestroy {
+export class PizzaModalComponent implements OnInit {
   @Input() pizza: Pizza;
 
   loading: Loading = {pizzaValidation: false, pizzaUpdate: false, pizzaImage: false};
@@ -44,16 +40,14 @@ export class PizzaModalComponent implements OnInit, OnDestroy {
     name: [Defaults.pizza.name, Validators.required],
     crust: [Defaults.pizza.crust, Validators.required],
     size: [Defaults.pizza.size, Validators.required],
-    price: [this.currencyPipe.transform(Defaults.pizza.price, 'USD'), [Validators.required]],
+    price: [Defaults.pizza.price, [Validators.required]],
     topping: [Defaults.pizza.toppings, Validators.required]
   });
 
-  priceControl = this.pizzaFormGroup.get('price') as FormControl;
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
   pizzaDataUrl: string | ArrayBuffer;
 
-  // subscriptions: Array<Subscription> = [];
 
   constructor(private fb: FormBuilder,
               private modalController: ModalController,
@@ -66,18 +60,6 @@ export class PizzaModalComponent implements OnInit, OnDestroy {
     if (this.pizza) {
       this.pizzaFormGroup.patchValue(this.pizza, {emitEvent: false});
     }
-
-    // const sub1 = this.priceControl.valueChanges.pipe(
-    //   debounceTime(500)
-    // ).subscribe((price) => {
-    //   const formattedPrice = this.currencyPipe.transform(price.replace(/[^\d.]/gi, ''), 'USD', 'symbol-narrow', '1.2-2');
-    //   this.priceControl.patchValue(formattedPrice, {emitEvent: false});
-    // });
-    // this.subscriptions.push(sub1);
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   closeModal() {

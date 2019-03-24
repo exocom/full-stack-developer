@@ -4620,10 +4620,10 @@ neo-async@^2.5.0, neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
   integrity sha512-MFh0d/Wa7vkKO3Y3LlacqAEeHK0mckVqzDieUKTT+KGxi+zIpeVsFxymkIiRpbpDziHc290Xr9A1O4Om7otoRA==
 
-ngx-mask@^7.7.0:
-  version "7.7.0"
-  resolved "https://registry.yarnpkg.com/ngx-mask/-/ngx-mask-7.7.0.tgz#9cfff2cc57bd30b9772b2130c26e7ea1741abfc3"
-  integrity sha512-AecdamfjhddUdg3l23sMChC39EWjuEv90yKz59JyvaowSYF1XD0EUTwVj8GmjZsQWBxBDA17V6dpeCnQkolCbA==
+ngx-mask-ionic@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/ngx-mask-ionic/-/ngx-mask-ionic-1.1.2.tgz#8b2afc81cef0bd3cd3d9fdb852f92181babed2c3"
+  integrity sha512-1iuJW3BWhrRqcsMvq2gw3DrC1iCZh9VPAM4PFnQvwm34vwzB580v2qWlxXtN3vA08q7XxgftAFI2uKV5P3TKNQ==
   dependencies:
     tslib "^1.9.0"
 
