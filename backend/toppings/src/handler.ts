@@ -108,9 +108,9 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 
   try {
     await s3.copyObject({
-      CopySource: `${TOPPINGS_S3_BUCKET}/${image.filename}`,
+      CopySource: `temp/${TOPPINGS_S3_BUCKET}/${image.filename}`,
       Bucket: TOPPINGS_S3_BUCKET,
-      Key: `temp/${name}.${ext}`,
+      Key: `${name}.${ext}`,
       ACL: 'public-read'
     }).promise();
     await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();
