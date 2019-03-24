@@ -86,6 +86,18 @@ ion-toast {
   &.shocked {
     --ion-color-base: var(--ion-color-danger, #f04141) url('/assets/pizza/shocked.svg') 80% center/55px 55px no-repeat !important;
   }
+
+  &.cut-in-half {
+    --ion-color-base: var(--ion-color-dark, #222428) url('/assets/pizza/cut-in-half.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.happy {
+    --ion-color-base: var(--ion-color-dark, #222428) url('/assets/pizza/happy.svg') 80% center/55px 55px no-repeat !important;
+  }
+
+  &.sleeping {
+    --ion-color-base: var(--ion-color-dark, #222428) url('/assets/pizza/sleeping.svg') 80% center/55px 55px no-repeat !important;
+  }
 }
 
 .toast-message {
@@ -113,12 +125,12 @@ ion-toast {
   background-size: 300% 100%;
   /* start with the scan bar just off the left side */
   background: linear-gradient(90deg,
-          rgba(0,0,0,.2),
-          rgba(0,0,0,.2) 50%,
+          rgba(0, 0, 0, .2),
+          rgba(0, 0, 0, .2) 50%,
           rgba(var(--ion-color-tertiary-rgb), .5) 55%,
           rgba(var(--ion-color-tertiary-rgb), 1) 56%,
-          rgba(0,0,0,.8) 56%,
-          rgba(0,0,0,.8)
+          rgba(0, 0, 0, .8) 56%,
+          rgba(0, 0, 0, .8)
   );
   /* make it big enough so when we slide it around still covers whole image */
   background-size: 300% 100%;
