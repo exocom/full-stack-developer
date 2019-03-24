@@ -20,7 +20,7 @@ const signedUrlRegExp = ({bucket, key}) => {
 };
 
 const bucketUrl = ({bucket, key}) => {
-  return `https://${bucket}/${key}`;
+  return `https://${bucket}.s3.amazonaws.com/${key.replace(/^temp\//, '')}`;
 };
 
 
@@ -78,12 +78,12 @@ describe('toppings', () => {
   });
 
   describe('create a topping', () => {
-    const imageExt = 'png';
     const name = 'pepperoni';
+    const filename = 'temp/pepperoni.png';
     const requestBody = {
       name,
       type: ToppingType.Meat,
-      image: {filename: 'temp/shoe.jpeg'}
+      image: {filename}
     };
 
     before(() => {
@@ -108,7 +108,7 @@ describe('toppings', () => {
       assert.equal(data.type, requestBody.type);
       assert.equal(data.image.url, bucketUrl({
         bucket: process.env.TOPPINGS_S3_BUCKET,
-        key: `${name}\.${imageExt}`
+        key: filename
       }));
     });
   });

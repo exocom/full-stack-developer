@@ -38,7 +38,7 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
     id: _id,
     name,
     type,
-    image: {url: `https://${TOPPINGS_S3_BUCKET}/${image.filename}`, filename: image.filename}
+    image: {url: `https://${TOPPINGS_S3_BUCKET}.s3.amazonaws.com/${image.filename}`, filename: image.filename}
   };
 };
 
