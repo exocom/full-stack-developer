@@ -41,7 +41,7 @@ export class PizzaModalComponent implements OnInit {
     crust: [Defaults.pizza.crust, Validators.required],
     size: [Defaults.pizza.size, Validators.required],
     price: [Defaults.pizza.price, [Validators.required]],
-    topping: [Defaults.pizza.toppings, Validators.required]
+    topping: [Defaults.pizza.toppings]
   });
 
   urlFormControl = this.imageFormGroup.get('url') as FormControl;

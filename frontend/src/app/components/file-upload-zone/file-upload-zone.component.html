@@ -1,6 +1,6 @@
-<input #inputElement id="image" type="file" (change)="handleSelect($event)" [multiple]="multiple"/>
-<label class="dropzone ion-align-self-center ion-justify-content-center" [class.hovered]="afd.filesHovered" flex
+<ion-input #inputElement id="image" type="file" (change)="handleSelect($event)" [multiple]="multiple"></ion-input>
+<div (click)="openFileDownLoad()" class="dropzone ion-align-self-center ion-justify-content-center" [class.hovered]="afd.filesHovered" flex
        for="image"
        appFileDrop #afd="appFileDrop" (filesDropped)="handleDrop($event)">
   <ion-icon [color]="afd.filesHovered ? 'success' : ''" name="md-cloud-upload"></ion-icon>
-</label>
+</div>
