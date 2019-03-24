@@ -3,6 +3,7 @@ import {AlertController, ModalController, ToastController} from '@ionic/angular'
 import {PizzaStoreService} from '../../services/pizza-store.service';
 import {Defaults, Pizza} from '../../services/contract/models/pizza';
 import {PizzaModalComponent} from '../../modals/pizza/pizza-modal.component';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-pizzas',
@@ -10,7 +11,8 @@ import {PizzaModalComponent} from '../../modals/pizza/pizza-modal.component';
   styleUrls: ['./pizzas.page.scss']
 })
 export class PizzasPage {
-  pizzas$ = this.pizzaStoreService.getPizzas();
+  pizzas$: Observable<Array<Pizza>> = this.pizzaStoreService.getPizzas();
+  showRemoveControl = false;
 
   constructor(public alertController: AlertController,
               public modalController: ModalController,
@@ -61,7 +63,7 @@ export class PizzasPage {
     this.showModal({pizza: Defaults.pizza});
   }
 
-  editTopping(pizza: Pizza) {
+  editPizza(pizza: Pizza) {
     this.showModal({pizza});
   }
 
@@ -71,5 +73,12 @@ export class PizzasPage {
       componentProps: {pizza}
     });
     await modal.present();
+  }
+
+  toggleShowRemove() {
+    this.showRemoveControl = !this.showRemoveControl;
+  }
+
+  viewDetail(pizza) {
   }
 }

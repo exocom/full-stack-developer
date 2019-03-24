@@ -12,6 +12,8 @@ import {ToppingModalComponent} from '../../modals/topping/topping-modal.componen
 })
 export class ToppingsPage {
   toppings$ = this.pizzaStoreService.getToppings();
+  displayMode: 'list' | 'grid' = 'list';
+  showRemoveControl = false;
 
   toppingsGroupByType$ = this.toppings$.pipe(
     map((toppings) => {
@@ -83,5 +85,13 @@ export class ToppingsPage {
       componentProps: {topping}
     });
     await modal.present();
+  }
+
+  toggleShowRemove() {
+    this.showRemoveControl = !this.showRemoveControl;
+  }
+
+  setDisplayMode(mode) {
+    this.displayMode = mode;
   }
 }

@@ -22,12 +22,13 @@ const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
 const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
 
-const mapMongoPizzaToPizza = ({_id, name, crust, size, image, toppings}: MongoPizza) => {
+const mapMongoPizzaToPizza = ({_id, name, crust, size, price, image, toppings}: MongoPizza) => {
   return {
     id: _id,
     name,
     crust,
     size,
+    price,
     image: {url: `https://${PIZZAS_S3_BUCKET}.s3.amazonaws.com/${image.filename}`, filename: image.filename},
     toppings: toppings.map(mapMongoToppingToTopping)
   };
