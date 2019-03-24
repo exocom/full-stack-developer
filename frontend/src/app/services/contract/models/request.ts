@@ -1,34 +1,40 @@
 import {ToppingType} from './topping';
+import {CrustType, PizzaSize} from './pizza';
 
 export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;
 
-export class ImageDataUrl {
-  dataUrl: string;
+export class ImageRequest {
+  filename: string;
 }
 
 export class CreateToppingBody {
   name: string;
   type: ToppingType;
-  image: ImageDataUrl;
-}
-
-export class DeleteToppingPathParameters {
-  toppingId: string;
-}
-
-export class UpdateToppingPathParameters {
-  toppingId: string;
+  image: ImageRequest;
 }
 
 export class UpdateToppingBody {
   id: string;
   name: string;
   type: ToppingType;
-  image: ImageDataUrl;
+  image: ImageRequest;
 }
-
 
 export class CreatePizzaBody {
   name: string;
-  // TODO : props.
+  crust: CrustType;
+  size: PizzaSize;
+  price: number;
+  image: ImageRequest;
+  toppings: Array<void>;
+}
+
+export class UpdatePizzaBody {
+  id: string;
+  name: string;
+  crust: CrustType;
+  size: PizzaSize;
+  price: number;
+  image: ImageRequest;
+  toppings: Array<void>;
 }

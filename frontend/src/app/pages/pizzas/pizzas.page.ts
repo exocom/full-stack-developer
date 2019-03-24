@@ -1,23 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {AlertController, ModalController, ToastController} from '@ionic/angular';
 import {PizzaStoreService} from '../../services/pizza-store.service';
-import {Pizza} from '../../services/contract/models/pizza';
+import {Defaults, Pizza} from '../../services/contract/models/pizza';
+import {PizzaModalComponent} from '../../modals/pizza/pizza-modal.component';
 
 @Component({
   selector: 'app-pizzas',
   templateUrl: './pizzas.page.html',
   styleUrls: ['./pizzas.page.scss']
 })
-export class PizzasPage implements OnInit {
+export class PizzasPage {
   pizzas$ = this.pizzaStoreService.getPizzas();
 
   constructor(public alertController: AlertController,
               public modalController: ModalController,
               private pizzaStoreService: PizzaStoreService,
               private toastCtrl: ToastController) {
-  }
-
-  ngOnInit() {
   }
 
   async removePizza(pizza: Pizza) {
@@ -60,7 +58,7 @@ export class PizzasPage implements OnInit {
   }
 
   createPizza() {
-    this.showModal({pizza: null});
+    this.showModal({pizza: Defaults.pizza});
   }
 
   editTopping(pizza: Pizza) {
@@ -75,6 +73,3 @@ export class PizzasPage implements OnInit {
     await modal.present();
   }
 }
-
-// TODO : crate modal.
-class PizzaModalComponent {}

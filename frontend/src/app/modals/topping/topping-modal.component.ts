@@ -16,7 +16,7 @@ interface Loading {
 }
 
 @Component({
-  selector: 'app-topping',
+  selector: 'app-topping-modal',
   templateUrl: './topping-modal.component.html',
   styleUrls: ['./topping-modal.component.scss']
 })
@@ -80,7 +80,7 @@ export class ToppingModalComponent implements OnInit {
     this.pizzaStoreService.createToppingImageSignedUrl({filename, mimeType})
       .pipe(
         switchMap((signedUrl) => {
-          return this.pizzaStoreService.uploadToppingImage({signedUrl, mimeType}, {file, base64str}).pipe(
+          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, base64str}).pipe(
             tap(() => {
               this.loading.toppingImage = false;
               this.loading.toppingValidation = true;

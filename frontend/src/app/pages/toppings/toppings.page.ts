@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {PizzaStoreService} from '../../services/pizza-store.service';
 import {map, tap} from 'rxjs/operators';
 import {Defaults, Topping, ToppingType} from '../../services/contract/models/topping';
@@ -10,19 +10,8 @@ import {ToppingModalComponent} from '../../modals/topping/topping-modal.componen
   templateUrl: './toppings.page.html',
   styleUrls: ['./toppings.page.scss']
 })
-export class ToppingsPage implements OnInit {
-
-
-  // modalOpen = false;
-
-  toppings$ = this.pizzaStoreService.getToppings()
-
-    // .pipe(tap(toppings => {
-    //   if (!this.modalOpen) {
-    //     this.editTopping(toppings[0]);
-    //     this.modalOpen = true;
-    //   }
-    // }));
+export class ToppingsPage {
+  toppings$ = this.pizzaStoreService.getToppings();
 
   toppingsGroupByType$ = this.toppings$.pipe(
     map((toppings) => {
@@ -39,18 +28,6 @@ export class ToppingsPage implements OnInit {
               public modalController: ModalController,
               private pizzaStoreService: PizzaStoreService,
               private toastCtrl: ToastController) {
-  }
-
-  async ngOnInit() {
-    // setTimeout(() => this.createTopping(), 200);
-
-    // const toast = await this.toastCtrl.create({
-    //   color: 'secondary',
-    //   cssClass: 'cloud-crumbs',
-    //   message: 'Om Nom Nom!\n Your pizza has been removed.',
-    //   showCloseButton: true
-    // });
-    // await toast.present();
   }
 
   async removeTopping(topping: Topping) {

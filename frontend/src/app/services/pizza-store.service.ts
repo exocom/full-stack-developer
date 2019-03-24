@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ToppingsService} from './contract/toppings.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Topping, ToppingBase} from './contract/models/topping';
+import {Topping} from './contract/models/topping';
 import {exhaustMap, shareReplay, tap} from 'rxjs/operators';
-import {CreatePizzaBody, CreateToppingBody, UpdateToppingBody} from './contract/models/request';
+import {CreatePizzaBody, CreateToppingBody, UpdatePizzaBody, UpdateToppingBody} from './contract/models/request';
 import {Pizza} from './contract/models/pizza';
 import {PizzasService} from './contract/pizzas.service';
 import {S3Service} from './contract/s3.service';
@@ -19,12 +19,12 @@ export class PizzaStoreService {
   constructor(private pizzasService: PizzasService, private s3Service: S3Service, private toppingsService: ToppingsService) {
   }
 
-  createToppingImageSignedUrl({filename, mimeType}): Observable<string> {
-    return this.toppingsService.createToppingImageSignedUrl({filename, contentType: mimeType});
+  uploadImage({signedUrl, mimeType}, {file, base64str}: ImageUpload) {
+    return this.s3Service.uploadToSignedUrl(signedUrl, mimeType, {file, base64str});
   }
 
-  uploadToppingImage({signedUrl, mimeType}, {file, base64str}: ImageUpload) {
-    return this.s3Service.uploadToSignedUrl(signedUrl, mimeType, {file, base64str});
+  createToppingImageSignedUrl({filename, mimeType}): Observable<string> {
+    return this.toppingsService.createToppingImageSignedUrl({filename, contentType: mimeType});
   }
 
   getToppings(): Observable<Array<Topping>> {
@@ -42,18 +42,24 @@ export class PizzaStoreService {
 
   updateTopping({topping}: { topping: UpdateToppingBody }): Observable<Topping> {
     return this.toppingsService.updateTopping(topping).pipe(
-      tap(() => this._refreshToppings.next(true))
+      tap(() => this._refreshToppings.next(true)),
+      tap(() => this._refreshPizzas.next(true))
     );
   }
 
   removeTopping({topping}: { topping: Topping }): Observable<void> {
     return this.toppingsService.removeTopping(topping.id).pipe(
-      tap(() => this._refreshToppings.next(true))
+      tap(() => this._refreshToppings.next(true)),
+      tap(() => this._refreshPizzas.next(true))
     );
   }
 
   detectTopping({filename}) {
     return this.toppingsService.detectTopping(filename);
+  }
+
+  createPizzaImageSignedUrl({filename, mimeType}): Observable<string> {
+    return this.pizzasService.createPizzaImageSignedUrl({filename, contentType: mimeType});
   }
 
   getPizzas(): Observable<Array<Pizza>> {
@@ -65,6 +71,12 @@ export class PizzaStoreService {
 
   createPizza({pizza}: { pizza: CreatePizzaBody }): Observable<Pizza> {
     return this.pizzasService.createPizza(pizza).pipe(
+      tap(() => this._refreshPizzas.next(true))
+    );
+  }
+
+  updatePizza({pizza}: { pizza: UpdatePizzaBody }): Observable<Topping> {
+    return this.pizzasService.updatePizza(pizza).pipe(
       tap(() => this._refreshPizzas.next(true))
     );
   }

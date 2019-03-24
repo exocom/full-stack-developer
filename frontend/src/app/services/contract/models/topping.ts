@@ -1,5 +1,3 @@
-import {ObjectId} from 'bson';
-
 export enum ToppingType {
   Sauce = 'sauce',
   Cheese = 'cheese',
@@ -17,6 +15,7 @@ export class ToppingBase {
 export class Topping extends ToppingBase {
   id: string;
   image: {
+    filename: string;
     url: string;
   };
 }
@@ -27,6 +26,7 @@ export class Defaults {
     name: null,
     type: null,
     image: {
+      filename: null,
       url: null
     }
   };

@@ -1,4 +1,4 @@
-import {Topping} from '../models/topping';
+import {Topping} from './topping';
 
 export enum CrustType {
   Regular = 'regular',
@@ -20,6 +20,25 @@ export class Pizza {
   crust: CrustType;
   size: PizzaSize;
   price: number;
-
+  image: {
+    filename: string;
+    url: string;
+  };
   toppings: Array<Topping>;
+}
+
+
+export class Defaults {
+  static pizza: Pizza = {
+    id: null,
+    name: null,
+    crust: null,
+    size: null,
+    price: null,
+    image: {
+      filename: null,
+      url: null
+    },
+    toppings: []
+  };
 }
