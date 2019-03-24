@@ -6,6 +6,7 @@ import {ObjectId} from 'mongodb';
 export const dataUrlRegExp = /^data:(.*?\/(.*?));base64,(.*$)/;
 
 export const imageFileNameRegExp = /^[-\w^&'@{}[\],$=!#().%+~].*?\.(gif|jpg|jpeg|tiff|png)$/i;
+export const tempToppingImageRegExp = /^temp\/(.*?.(gif|jpg|jpeg|tiff|png))$/i;
 
 const enumCustomErrorMessage: ValidationOptions = {
   message: ({property, constraints}) => {
@@ -14,6 +15,13 @@ const enumCustomErrorMessage: ValidationOptions = {
     return `${property} must be a valid enum value: ${values}`;
   }
 };
+
+export class ToppingImageRequest {
+  @IsDefined()
+  @Matches(imageFileNameRegExp)
+  @Matches(tempToppingImageRegExp)
+  filename: string;
+}
 
 export class ImageDataUrl {
   @IsDefined()
@@ -40,8 +48,8 @@ export class CreateToppingBody {
 
   @IsDefined()
   @ValidateNested()
-  @Type(() => ImageDataUrl)
-  image: ImageDataUrl;
+  @Type(() => ToppingImageRequest)
+  image: ToppingImageRequest;
 }
 
 export class DeleteToppingPathParameters {

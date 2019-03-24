@@ -6,12 +6,13 @@ import {
   CreateToppingBody,
   dataUrlRegExp,
   DeleteToppingPathParameters,
-  DetectToppingBody,
+  DetectToppingBody, tempToppingImageRegExp,
   UpdateToppingBody,
   UpdateToppingPathParameters,
   UploadToppingImageBody
 } from './models/request';
 import {MongoClient} from 'mongodb';
+import AWS from 'aws-sdk';
 import {Rekognition, S3} from 'aws-sdk';
 import {MongoTopping} from './models/mongo-topping';
 import {
@@ -24,6 +25,9 @@ import {
   toppingTypeRegExp
 } from './models/topping';
 
+
+export const aws = AWS; // Used for mocking AWS in tests.
+
 const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET, AWS_REGION} = process.env;
 const s3 = new S3();
 const rekognition = new Rekognition({region: AWS_REGION || 'us-west-2'});
@@ -34,7 +38,7 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
     id: _id,
     name,
     type,
-    image: {url: s3.getSignedUrl('getObject', {Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key})}
+    image: {url: `https://${TOPPINGS_S3_BUCKET}/${image.filename}`, filename: image.filename}
   };
 };
 
@@ -64,6 +68,15 @@ export const createToppingImageSingedUrl: ApiGatewayHandler = async (event) => {
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: signedUrl}});
 };
 
+export const createToppingZ = async () => {
+
+  const r = s3.putObject({Bucket: '1', Key: 'a', Body: new Buffer('')}, (err, data) => {
+    console.log(err, data);
+  });
+  return new Promise(() => {
+  });
+}
+
 export const createTopping: ApiGatewayHandler = async (event) => {
   const client = await mongoClientConnect;
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
@@ -90,14 +103,26 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
   }
 
-  const [match, contentType, ext, base64data] = image.dataUrl.match(dataUrlRegExp);
+  const [match, filename, ext] = image.filename.match(tempToppingImageRegExp);
+  /*
+  const existingImage = await s3.headObject({Bucket: TOPPINGS_S3_BUCKET, Key: filename}).promise().catch(e => null);
+  if (existingTopping) {
+    const error = {
+      type: 'Conflict',
+      message: 'An image with that name already exists!'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
+  }
+  */
+
   try {
-    await s3.putObject({
+    await s3.copyObject({
+      CopySource: `${TOPPINGS_S3_BUCKET}/${image.filename}`,
       Bucket: TOPPINGS_S3_BUCKET,
       Key: `${name}.${ext}`,
-      ContentType: contentType,
-      Body: Buffer.from(base64data, 'base64')
+      ACL: 'public-read'
     }).promise();
+    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();
   } catch (e) {
     const error = {
       type: 'Upload Failure',
@@ -106,11 +131,12 @@ export const createTopping: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
 
-  const {ops} = await toppingCollection.insertOne({
+  const insertMongoTopping: MongoTopping = {
     name,
     type,
-    image: {s3key: `${name}.${ext}`}
-  });
+    image: {filename: `${name}.${ext}`}
+  };
+  const {ops} = await toppingCollection.insertOne(insertMongoTopping);
   const [mongoTopping] = ops;
   const topping = mapMongoToppingToTopping(mongoTopping);
   return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
@@ -129,10 +155,10 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const {toppingId} = plainToClass(DeleteToppingPathParameters, event.pathParameters);
-  const {value} = await toppingCollection.findOneAndDelete({_id: toppingId}, {projection: {image: 1}});
+  const {value}: { value: MongoTopping } = await toppingCollection.findOneAndDelete({_id: toppingId}, {projection: {image: 1}});
   if (value) {
     const {image} = value;
-    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.s3key}).promise();
+    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();
   }
   return apiGatewayUtil.sendJson({statusCode: value ? 204 : 404});
 };
@@ -178,14 +204,15 @@ export const updateTopping: ApiGatewayHandler = async (event) => {
     };
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
-
-  const {lastErrorObject, value} = await toppingCollection.findOneAndUpdate({_id: toppingId}, {
-    $set: {
-      name,
-      type,
-      image: {s3key: `${name}.${ext}`}
-    }
-  }, {upsert: true, returnOriginal: false});
+  const setMongoTopping: MongoTopping = {
+    name,
+    type,
+    image: {filename: `${name}.${ext}`}
+  };
+  const {lastErrorObject, value} = await toppingCollection.findOneAndUpdate({_id: toppingId}, {$set: setMongoTopping}, {
+    upsert: true,
+    returnOriginal: false
+  });
 
   const topping = mapMongoToppingToTopping(value);
   return apiGatewayUtil.sendJson({statusCode: lastErrorObject.updatedExisting ? 200 : 201, body: {data: topping}});

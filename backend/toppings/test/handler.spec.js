@@ -5,8 +5,10 @@ const {assert} = require('chai');
 const {ObjectId} = require('mongodb');
 const mongoUnit = require('mongo-unit');
 const awsMock = require('aws-sdk-mock');
+const AWS = require('aws-sdk');
 const {StandaloneLocalDevServer} = require('@kalarrs/serverless-local-dev-server/src/StandaloneLocalDevServer');
 const {readFile} = require('fs').promises;
+const moment = require('moment');
 
 const serverlessLocalServer = new StandaloneLocalDevServer({
   projectPath: join(__dirname, '../'),
@@ -16,6 +18,11 @@ const serverlessLocalServer = new StandaloneLocalDevServer({
 const signedUrlRegExp = ({bucket, key}) => {
   return new RegExp(`^https:\\/\\/${bucket}\.s3(\.us-west-2)?\.amazonaws\.com/${key}`)
 };
+
+const bucketUrl = ({bucket, key}) => {
+  return `https://${bucket}/${key}`;
+};
+
 
 const {dataUrlRegExp} = require('../src/models/request');
 const {ToppingType} = require('../src/models/topping');
@@ -27,13 +34,13 @@ describe('toppings', () => {
         _id: ObjectId('5c919a1b4678ee70a617858e'),
         name: 'sausage',
         type: 'meat',
-        image: {s3key: 'sausage.gif'}
+        image: {filename: 'sausage.gif'}
       },
       {
         _id: ObjectId('5c91990bd24291707e38a906'),
         name: 'pineapple',
         type: 'fruit',
-        image: {s3key: 'pineapple.gif'}
+        image: {filename: 'pineapple.gif'}
       }
     ]
   };
@@ -49,13 +56,16 @@ describe('toppings', () => {
       ...serverlessLocalServer.slsYaml.provider.environment,
       MONGO_URI: mongoUri,
     };
+    awsMock.setSDKInstance(AWS);
+    awsMock.mock('S3', 'copyObject', null);
+    awsMock.mock('S3', 'deleteObject', null);
+    awsMock.mock('S3', 'headObject', null);
+    awsMock.mock('S3', 'putObject', null);
     handler = require('../src/handler');
   });
 
   beforeEach(async () => {
     await mongoUnit.initDb(process.env.MONGO_URI, testData);
-    awsMock.mock('S3', 'putObject', {ETag: '4166c51556fff0f1354b2f5704b1c297'});
-    awsMock.mock('S3', 'deleteObject', {});
   });
 
   after(async () => {
@@ -65,7 +75,6 @@ describe('toppings', () => {
 
   afterEach(async () => {
     await mongoUnit.drop();
-    awsMock.restore('S3');
   });
 
   describe('create a topping', () => {
@@ -74,8 +83,19 @@ describe('toppings', () => {
     const requestBody = {
       name,
       type: ToppingType.Meat,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename: 'temp/shoe.jpeg'}
     };
+
+    before(() => {
+      awsMock.remock('S3', 'putObject', {mock: true, ETag: '2'});
+      awsMock.remock('S3', 'copyObject', {
+        mock: true,
+        CopyObjectResult: {
+          ETag: "\"25f2f54b3c108fbf1b4472154072ea38\"",
+          LastModified: moment().toISOString()
+        }
+      });
+    });
 
     it('should return a new topping', async () => {
       const {createTopping} = handler;
@@ -86,13 +106,13 @@ describe('toppings', () => {
       const {data} = JSON.parse(body);
       assert.equal(data.name, requestBody.name);
       assert.equal(data.type, requestBody.type);
-      assert.match(data.image.url, signedUrlRegExp({
+      assert.equal(data.image.url, bucketUrl({
         bucket: process.env.TOPPINGS_S3_BUCKET,
         key: `${name}\.${imageExt}`
       }));
     });
   });
-
+  return;
   describe('create a topping with missing name', () => {
     const imageExt = 'png';
     const requestBody = {
@@ -350,7 +370,7 @@ describe('toppings', () => {
     };
 
     beforeEach(async () => {
-      await awsMock.restore('S3');
+      // await awsMock.restore('S3');
       await awsMock.mock('S3', 'putObject', (param, cb) => {
         cb(new Error('failed for some reason!'))
       });
