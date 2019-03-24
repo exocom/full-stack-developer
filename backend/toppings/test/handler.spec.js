@@ -461,19 +461,27 @@ describe('toppings', () => {
     });
   });
 
-  return;
-
   describe('update an existing topping', () => {
     const name = 'onion';
-    const imageExt = 'png';
+    const filename = 'onion.png';
     const {_id} = testData.toppings[0];
     const toppingId = _id.toString();
     const requestBody = {
       id: toppingId,
       name,
       type: ToppingType.Vegetable,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
+
+    before(() => {
+      awsMock.remock('S3', 'copyObject', {
+        mock: true,
+        CopyObjectResult: {
+          ETag: "\"25f2f54b3c108fbf1b4472154072ea38\"",
+          LastModified: moment().toISOString()
+        }
+      });
+    });
 
     it('should return an updated topping', async () => {
       const {updateTopping} = handler;
@@ -484,23 +492,33 @@ describe('toppings', () => {
       const {data} = JSON.parse(body);
       assert.equal(data.name, requestBody.name);
       assert.equal(data.type, requestBody.type);
-      assert.match(data.image.url, signedUrlRegExp({
+      assert.equal(data.image.url, bucketUrl({
         bucket: process.env.TOPPINGS_S3_BUCKET,
-        key: `${name}\.${imageExt}`
+        key: filename
       }));
     });
   });
 
   describe('update a new topping', () => {
-    const imageExt = 'png';
     const name = 'honey';
+    const filename = 'honey.png';
     const toppingId = ObjectId().toString();
     const requestBody = {
       id: toppingId,
       name,
       type: ToppingType.Sauce,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
+
+    before(() => {
+      awsMock.remock('S3', 'copyObject', {
+        mock: true,
+        CopyObjectResult: {
+          ETag: "\"25f2f54b3c108fbf1b4472154072ea38\"",
+          LastModified: moment().toISOString()
+        }
+      });
+    });
 
     it('should return an updated topping', async () => {
       const {updateTopping} = handler;
@@ -512,14 +530,15 @@ describe('toppings', () => {
       assert.equal(data.id, requestBody.id);
       assert.equal(data.name, requestBody.name);
       assert.equal(data.type, requestBody.type);
-      assert.match(data.image.url, signedUrlRegExp({
+      assert.equal(data.image.url, bucketUrl({
         bucket: process.env.TOPPINGS_S3_BUCKET,
-        key: `${name}\.${imageExt}`
+        key: filename
       }));
     });
   });
 
   // NOTE: The results are interesting. Pretty descent for what it is.
+  // NOTE: The test are out of date, would need to upload the image to s3 in each test in order for it to work.
   describe.skip('detect toppings from images', () => {
     describe('detect a cheese topping from an image 1', () => {
       const imageName = 'cheese.jpg';

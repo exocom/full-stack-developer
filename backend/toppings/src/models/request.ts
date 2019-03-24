@@ -75,7 +75,7 @@ export class UpdateToppingBody {
 
   @IsDefined()
   @ValidateNested()
-  @Type(() => ImageDataUrl)
+  @Type(() => ToppingImageRequest)
   image: ToppingImageRequest;
 }
 
