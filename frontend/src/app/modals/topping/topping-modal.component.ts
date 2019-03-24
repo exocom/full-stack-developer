@@ -89,8 +89,17 @@ export class ToppingModalComponent implements OnInit {
         }),
         switchMap(() => this.pizzaStoreService.detectTopping({filename: `temp/${filename}`}))
       )
-      .subscribe((toppingBase) => {
+      .subscribe(async (toppingBase) => {
         const {name, type} = toppingBase;
+        const toast = await this.toastCtrl.create({
+          color: 'success',
+          cssClass: 'eyebrow',
+          message: `Ha\nI know what that is!${!name || !type ? ' Sorta.' : ''}`,
+          duration: 3000,
+          showCloseButton: true
+        });
+        await toast.present();
+
         this.toppingFormGroup.patchValue({name, type});
 
         this.loading.toppingImage = false;

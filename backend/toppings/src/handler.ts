@@ -233,7 +233,7 @@ export const detectTopping: ApiGatewayHandler = async (event) => {
     let type: ToppingType = null;
     for (const label of result.Labels) {
       if (toppingTypeRegExp.test(label.Name)) {
-        type = label.Name as ToppingType;
+        type = label.Name.toLowerCase() as ToppingType;
         break;
       }
     }

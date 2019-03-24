@@ -60,6 +60,10 @@ ion-toast {
     --ion-color-base: var(--ion-color-danger, #f04141) url('/assets/pizza/annoyed.svg') 80% center/55px 55px no-repeat !important;
   }
 
+  &.eyebrow {
+    --ion-color-base: var(--ion-color-secondary, #0cd1e8) url('/assets/pizza/eyebrow.svg') 80% center/55px 55px no-repeat !important;
+  }
+
   &.crumbs {
     --ion-color-base: var(--ion-color-secondary, #0cd1e8) url('/assets/pizza/crumbs.svg') 80% center/55px 55px no-repeat !important;
   }
