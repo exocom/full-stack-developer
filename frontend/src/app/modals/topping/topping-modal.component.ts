@@ -29,7 +29,7 @@ export class ToppingModalComponent implements OnInit {
   toppingTypes = ToppingType;
 
   imageFormGroup = this.fb.group({
-    dataUrl: [Defaults.topping.image.url],
+    filename: [null],
     url: [null]
   });
   toppingFormGroup = this.fb.group({
@@ -39,7 +39,6 @@ export class ToppingModalComponent implements OnInit {
     type: [Defaults.topping.type, Validators.required]
   });
 
-  dataUrlFormControl = this.imageFormGroup.get('dataUrl') as FormControl;
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
   toppingDataUrl: string | ArrayBuffer;
@@ -63,6 +62,8 @@ export class ToppingModalComponent implements OnInit {
 
   private async uploadImage({filename, mimeType}, {file, base64str}: ImageUpload) {
     this.loading.toppingImage = true;
+    this.loading.toppingValidation = false;
+    this.toppingFormGroup.disable();
     if (!Object.values(ImageMimeTypes).includes(mimeType)) {
       const toast = await this.toastCtrl.create({
         color: 'danger',
@@ -72,6 +73,7 @@ export class ToppingModalComponent implements OnInit {
       });
       await toast.present();
       this.loading.toppingImage = false;
+      this.toppingFormGroup.enable();
       return;
     }
 
@@ -103,21 +105,29 @@ export class ToppingModalComponent implements OnInit {
         this.toppingFormGroup.patchValue({name, type});
 
         this.loading.toppingImage = false;
-        this.loading.toppingValidation = true;
+        this.loading.toppingValidation = false;
+        this.toppingFormGroup.enable();
       }, async (res) => {
+        console.log(res);
+        debugger;
         const message = res && res.error && res.error.error && res.error.error.message || 'Important message goes here!';
         const toast = await this.toastCtrl.create({
           color: 'danger',
           cssClass: 'shocked',
-          message: res && res.statusCode === 404 ? 'Is that even food!\n Sorry I can\'t help.' : `Something went wrong!\n${message}`,
+          message: res && res.status === 404 ? 'Is that even food!\n Sorry I can\'t help.' : `Something went wrong!\n${message}`,
           showCloseButton: true
         });
         await toast.present();
         this.loading.toppingImage = false;
+        this.loading.toppingValidation = false;
+        this.toppingFormGroup.enable();
       });
   }
 
-  processFile(file: File) {
+  processFile(file: FileList | File) {
+    if (file instanceof FileList) {
+      file = file[0];
+    }
     this.loading.toppingImage = true;
     const fileReader = new FileReader();
     fileReader.onload = () => {

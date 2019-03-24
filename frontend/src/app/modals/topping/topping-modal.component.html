@@ -24,7 +24,15 @@
     </div>
     -->
 
-    <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
+    <div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
+      <ng-container *ngIf="urlFormControl.value else noImage">
+        <ion-img [src]="urlFormControl.value" [class.scanning]="loading.toppingValidation"></ion-img>
+      </ng-container>
+      <ng-template #noImage>
+        <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
+      </ng-template>
+    </div>
+    <ion-progress-bar *ngIf="loading.toppingImage" type="indeterminate" color="tertiary"></ion-progress-bar>
 
     <ion-item>
       <ion-label position="stacked">Name</ion-label>
@@ -46,7 +54,6 @@
         </div>
       </ng-container>
     </div>-->
-    <div flex-row style="flex: 1; height: 100%;">&nbsp;</div>
     <ion-progress-bar *ngIf="loading.toppingUpdate" type="indeterminate" color="tertiary"></ion-progress-bar>
     <ion-button color="success" size="full" (click)="save()" [disabled]="loading.toppingUpdate">Save</ion-button>
   </form>

@@ -23,6 +23,7 @@ video.hidden {
 }
 
 .teacher {
+  position: relative;
   padding-top: 10px;
   background-clip: border-box;
   background: var(--background);
@@ -46,5 +47,8 @@ video.hidden {
     bottom: 21%;
     left: 39%;
   }
+}
 
+ion-note {
+  font-size: 8px;
 }

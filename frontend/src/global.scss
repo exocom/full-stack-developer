@@ -16,7 +16,6 @@ ion-img.logo {
   display: inline-block;
 }
 
-
 ion-title {
   text-align: center;
 
@@ -27,6 +26,11 @@ ion-title {
   }
 }
 
+[flex-grow] {
+  flex-grow: 1;
+}
+
+
 [flex] {
   display: flex;
 }
@@ -36,6 +40,9 @@ ion-title {
   flex-direction: column;
 }
 
+.fix-loading-bottom {
+  margin-bottom: 3px;
+}
 
 .cloud-message {
   display: flex;
@@ -106,12 +113,12 @@ ion-toast {
   background-size: 300% 100%;
   /* start with the scan bar just off the left side */
   background: linear-gradient(90deg,
-          rgba(0, 0, 0, 1),
-          rgba(0, 0, 0, 1) 50%,
+          rgba(0,0,0,.2),
+          rgba(0,0,0,.2) 50%,
           rgba(var(--ion-color-tertiary-rgb), .5) 55%,
           rgba(var(--ion-color-tertiary-rgb), 1) 56%,
-          rgba(0, 0, 0, 1) 56%,
-          rgba(0, 0, 0, 1)
+          rgba(0,0,0,.8) 56%,
+          rgba(0,0,0,.8)
   );
   /* make it big enough so when we slide it around still covers whole image */
   background-size: 300% 100%;
