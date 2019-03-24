@@ -13,7 +13,7 @@ import {
 import {MongoClient} from 'mongodb';
 import AWS from 'aws-sdk';
 import {Rekognition, S3} from 'aws-sdk';
-import {MongoTopping} from './models/mongo-topping';
+import {MongoTopping, MongoToppingImage} from './models/mongo-topping';
 import {
   cheeseRegExp,
   meatRegExp,
@@ -43,15 +43,16 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
 };
 
 const updateImage = async ({image, name, ext}) => {
+  const tempKey = `${TOPPINGS_S3_BUCKET}/${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`;
   await s3.copyObject({
-    CopySource: `${TOPPINGS_S3_BUCKET}/${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`,
+    CopySource: tempKey,
     Bucket: TOPPINGS_S3_BUCKET,
     Key: `${name}.${ext}`,
     ACL: 'public-read'
   }).promise();
   await s3.deleteObject({
     Bucket: TOPPINGS_S3_BUCKET,
-    Key: `${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`
+    Key: tempKey
   }).promise()
     .catch(e => null); // Ignore because bucket policy will always delete these images anyways.
 };
@@ -141,7 +142,7 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
   const toppingCollection = client.db().collection(TOPPING_COLLECTION);
 
   const {toppingId} = plainToClass(DeleteToppingPathParameters, event.pathParameters);
-  const {value}: { value: MongoTopping } = await toppingCollection.findOneAndDelete({_id: toppingId}, {projection: {image: 1}});
+  const {value}: { value: {image: MongoToppingImage} } = await toppingCollection.findOneAndDelete({_id: toppingId}, {projection: {image: 1}});
   if (value) {
     const {image} = value;
     await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();

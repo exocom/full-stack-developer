@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 const {StandaloneLocalDevServer} = require('@kalarrs/serverless-local-dev-server/src/StandaloneLocalDevServer');
 const {readFile} = require('fs').promises;
 const moment = require('moment');
-const {imageFileNameRegExp} = require('../src/models/request');
+const {imageFileNameRegExp} = require('../../common/src/image');
 const {ToppingType} = require('../src/models/topping');
 
 const serverlessLocalServer = new StandaloneLocalDevServer({

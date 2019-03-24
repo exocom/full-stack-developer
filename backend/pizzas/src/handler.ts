@@ -10,10 +10,10 @@ import {
   UploadPizzaImageBody
 } from './models/request';
 import {MongoClient} from 'mongodb';
-import {MongoPizza} from './models/mongo-pizza';
+import {MongoPizza, MongoPizzaImage} from './models/mongo-pizza';
 import {mapMongoToppingToTopping} from '../../toppings/src/handler';
 import AWS, {S3} from 'aws-sdk';
-import {UploadToppingImageBody} from '../../toppings/src/models/request';
+import {imageFileNameRegExp} from '../../common/src/image';
 
 export const aws = AWS; // Used for mocking AWS in tests.
 
@@ -22,26 +22,28 @@ const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
 const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
 
-const mapMongoPizzaToPizza = ({_id, name, crust, size, toppings}: MongoPizza) => {
+const mapMongoPizzaToPizza = ({_id, name, crust, size, image, toppings}: MongoPizza) => {
   return {
     id: _id,
     name,
     crust,
     size,
+    image: {url: `https://${PIZZAS_S3_BUCKET}.s3.amazonaws.com/${image.filename}`, filename: image.filename},
     toppings: toppings.map(mapMongoToppingToTopping)
   };
 };
 
 const updateImage = async ({image, name, ext}) => {
+  const tempKey = `${PIZZAS_S3_BUCKET}/${PIZZA_TEMP_IMAGE_PREFIX}/${image.filename}`;
   await s3.copyObject({
-    CopySource: `${PIZZAS_S3_BUCKET}/${PIZZA_TEMP_IMAGE_PREFIX}/${image.filename}`,
+    CopySource: tempKey,
     Bucket: PIZZAS_S3_BUCKET,
     Key: `${name}.${ext}`,
     ACL: 'public-read'
   }).promise();
   await s3.deleteObject({
     Bucket: PIZZAS_S3_BUCKET,
-    Key: `${PIZZA_TEMP_IMAGE_PREFIX}/${image.filename}`
+    Key: tempKey
   }).promise()
     .catch(e => null); // Ignore because bucket policy will always delete these images anyways.
 };
@@ -86,25 +88,39 @@ export const createPizza: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
 
-  const {name, crust, size, toppings} = body;
-  const existingTopping = await pizzaCollection.findOne({name});
-  if (existingTopping) {
+  const {name, crust, size, price, image} = body;
+  const existingPizza = await pizzaCollection.findOne({name});
+  if (existingPizza) {
     const error = {
       type: 'Conflict',
-      message: 'A topping with that name already exists.'
+      message: 'A pizza with that name already exists.'
     };
     return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
   }
 
-  const {ops} = await pizzaCollection.insertOne({
+  const [match, ext] = image.filename.match(imageFileNameRegExp);
+  try {
+    await updateImage({image, name, ext});
+  } catch (e) {
+    const error = {
+      type: 'Upload Failure',
+      message: 'Unable to save the image.'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
+  }
+
+  const insertMongoPizza: MongoPizza = {
     name,
     crust,
     size,
-    toppings
-  });
+    price,
+    image: {filename: `${name}.${ext}`},
+    toppings: []
+  };
+  const {ops} = await pizzaCollection.insertOne(insertMongoPizza);
   const [mongoPizza] = ops;
-  const topping = mapMongoPizzaToPizza(mongoPizza);
-  return apiGatewayUtil.sendJson({statusCode: 201, body: {data: topping}});
+  const pizza = mapMongoPizzaToPizza(mongoPizza);
+  return apiGatewayUtil.sendJson({statusCode: 201, body: {data: pizza}});
 };
 
 export const getPizzas: ApiGatewayHandler = async () => {
@@ -120,9 +136,12 @@ export const deletePizza: ApiGatewayHandler = async (event) => {
   const pizzaCollection = client.db().collection(PIZZA_COLLECTION);
 
   const {pizzaId} = plainToClass(DeletePizzaPathParameters, event.pathParameters);
-  const {deletedCount} = await pizzaCollection.deleteOne({_id: pizzaId});
-
-  return apiGatewayUtil.sendJson({statusCode: deletedCount === 0 ? 404 : 204});
+  const {value}: { value: { image: MongoPizzaImage } } = await pizzaCollection.findOneAndDelete({_id: pizzaId}, {projection: {image: 1}});
+  if (value) {
+    const {image} = value;
+    await s3.deleteObject({Bucket: PIZZAS_S3_BUCKET, Key: image.filename}).promise();
+  }
+  return apiGatewayUtil.sendJson({statusCode: value ? 204 : 404});
 };
 
 export const updatePizza: ApiGatewayHandler = async (event) => {
@@ -150,17 +169,70 @@ export const updatePizza: ApiGatewayHandler = async (event) => {
     return apiGatewayUtil.sendJson({statusCode: 400, body: {error}});
   }
 
-  const {name, crust, size, toppings} = body;
+  const {name, crust, size, price, image} = body;
+  const [match, ext] = image.filename.match(imageFileNameRegExp);
+  try {
+    await updateImage({image, name, ext});
+  } catch (e) {
+    const error = {
+      type: 'Upload Failure',
+      message: 'Unable to save the image.'
+    };
+    return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
+  }
 
-  const {lastErrorObject, value} = await pizzaCollection.findOneAndUpdate({_id: pizzaId}, {
-    $set: {
-      name,
-      crust,
-      size,
-      toppings
-    }
-  }, {upsert: true, returnOriginal: false});
+  const setMongoPizza: MongoPizza = {
+    name,
+    crust,
+    size,
+    price,
+    image
+  };
+  const {lastErrorObject, value} = await pizzaCollection.findOneAndUpdate({_id: pizzaId}, {$set: setMongoPizza}, {
+    upsert: true,
+    returnOriginal: false
+  });
 
-  const topping = mapMongoPizzaToPizza(value);
-  return apiGatewayUtil.sendJson({statusCode: lastErrorObject.updatedExisting ? 200 : 201, body: {data: topping}});
+  const pizza = mapMongoPizzaToPizza(value);
+  return apiGatewayUtil.sendJson({statusCode: lastErrorObject.updatedExisting ? 200 : 201, body: {data: pizza}});
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
