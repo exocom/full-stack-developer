@@ -6,9 +6,14 @@ import {CreatePizzaBody, DeletePizzaPathParameters, UpdatePizzaBody, UpdatePizza
 import {MongoClient} from 'mongodb';
 import {MongoPizza} from './models/mongo-pizza';
 import {mapMongoToppingToTopping} from '../../toppings/src/handler';
+import AWS, {S3} from 'aws-sdk';
 
-const {MONGO_URI, PIZZA_COLLECTION} = process.env;
+export const aws = AWS; // Used for mocking AWS in tests.
+
+const {MONGO_URI, PIZZA_COLLECTION, PIZZA_S3_BUCKET, PIZZA_TEMP_IMAGE_PREFIX} = process.env;
+const s3 = new S3();
 const apiGatewayUtil = new ApiGatewayUtil();
+const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
 
 const mapMongoPizzaToPizza = ({_id, name, crust, size, toppings}: MongoPizza) => {
   return {
@@ -20,7 +25,19 @@ const mapMongoPizzaToPizza = ({_id, name, crust, size, toppings}: MongoPizza) =>
   };
 };
 
-const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+const updateImage = async ({image, name, ext}) => {
+  await s3.copyObject({
+    CopySource: `${PIZZA_S3_BUCKET}/${PIZZA_TEMP_IMAGE_PREFIX}/${image.filename}`,
+    Bucket: PIZZA_S3_BUCKET,
+    Key: `${name}.${ext}`,
+    ACL: 'public-read'
+  }).promise();
+  await s3.deleteObject({
+    Bucket: PIZZA_S3_BUCKET,
+    Key: `${PIZZA_TEMP_IMAGE_PREFIX}/${image.filename}`
+  }).promise()
+    .catch(e => null); // Ignore because bucket policy will always delete these images anyways.
+};
 
 export const createPizza: ApiGatewayHandler = async (event) => {
   const client = await mongoClientConnect;

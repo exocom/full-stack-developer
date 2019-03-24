@@ -72,7 +72,6 @@ functions:
           method: DELETE
           path: toppings/{toppingId}
           cors: true
-
   updateTopping:
     handler: src/handler.updateTopping
     layers:
@@ -82,7 +81,6 @@ functions:
           method: PUT
           path: toppings/{toppingId}
           cors: true
-
   detectTopping:
     handler: src/handler.detectTopping
     layers:

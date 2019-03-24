@@ -30,11 +30,37 @@ resources:  # CloudFormation template syntax
                 - GET
                 - PUT
               MaxAge: 3000
+    PizzasBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        LifecycleConfiguration:
+          Rules:
+            - Id: CleanupTemp
+              Prefix: temp
+              Status: Enabled
+              AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 1
+              ExpirationInDays: 1
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+              MaxAge: 3000
   Outputs:
     ToppingsBucketName:
       Value:
         Ref: ToppingsBucket
       Export:
         Name: ToppingsBucket
+    PizzasBucketName:
+      Value:
+        Ref: PizzasBucket
+      Export:
+        Name: PizzasBucket
 custom:
   layers: "${file(../.env/${self:provider.stage}.yml):custom.layers, file(.env/${self:provider.stage}.yml):custom.layers}"

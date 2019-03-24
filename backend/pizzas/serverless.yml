@@ -11,20 +11,34 @@ provider:
   profile: ${file(../serverless.yml):provider.profile}
   region: ${file(../serverless.yml):provider.region}
   stage: ${file(../serverless.yml):provider.stage}
+  timeout: 30
   memorySize: 128
   environment:
     MONGO_URI: ${file(../serverless.yml):provider.environment.MONGO_URI}
     PIZZA_COLLECTION: ${file(../serverless.yml):provider.environment.PIZZA_COLLECTION}
-    TOPPINGS_S3_BUCKET: ${cf:full-stack-developer-workspace-${file(../serverless.yml):provider.stage}.ToppingsBucketName}
+    PIZZAS_S3_BUCKET: ${cf:full-stack-developer-workspace-${file(../serverless.yml):provider.stage}.PizzasBucketName}
+    PIZZA_TEMP_IMAGE_PREFIX: "temp"
 
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "s3:GetObject"
+        - "s3:DeleteObject"
+        - "s3:PutObject"
+        - "s3:PutObjectAcl"
       Resource:
-        - "arn:aws:s3:::${self:provider.environment.TOPPINGS_S3_BUCKET}/*"
+        - "arn:aws:s3:::${self:provider.environment.PIZZAS_S3_BUCKET}/*"
 
 functions:
+  createPizzaImageSingedUrl:
+    handler: src/handler.createPizzaImageSingedUrl
+    layers:
+      - ${self:custom.layers.node-modules}
+    events:
+      - http:
+          method: POST
+          path: pizza-image-signed-url
+          cors: true
   createPizza:
     handler: src/handler.createPizza
     layers:
@@ -59,7 +73,7 @@ functions:
     events:
       - http:
           method: PUT
-          path: toppings/{toppingId}
+          path: pizzas/{pizzaId}
           cors: true
 
 custom:
