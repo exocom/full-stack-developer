@@ -4,7 +4,6 @@ import {validate} from 'class-validator';
 import {ApiGatewayHandler, ApiGatewayUtil} from '@kalarrs/aws-util';
 import {
   CreateToppingBody,
-  dataUrlRegExp,
   DeleteToppingPathParameters,
   DetectToppingBody, imageFileNameRegExp,
   UpdateToppingBody,
@@ -25,13 +24,13 @@ import {
   toppingTypeRegExp
 } from './models/topping';
 
-
 export const aws = AWS; // Used for mocking AWS in tests.
 
 const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET, TOPPING_TEMP_IMAGE_PREFIX, AWS_REGION} = process.env;
 const s3 = new S3();
 const rekognition = new Rekognition({region: AWS_REGION || 'us-west-2'});
 const apiGatewayUtil = new ApiGatewayUtil();
+const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
 
 export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping) => {
   return {
@@ -42,7 +41,19 @@ export const mapMongoToppingToTopping = ({_id, type, image, name}: MongoTopping)
   };
 };
 
-const mongoClientConnect = MongoClient.connect(MONGO_URI, {useNewUrlParser: true});
+const updateImage = async ({image, name, ext}) => {
+  await s3.copyObject({
+    CopySource: `${TOPPINGS_S3_BUCKET}/${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`,
+    Bucket: TOPPINGS_S3_BUCKET,
+    Key: `${name}.${ext}`,
+    ACL: 'public-read'
+  }).promise();
+  await s3.deleteObject({
+    Bucket: TOPPINGS_S3_BUCKET,
+    Key: `${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`
+  }).promise()
+    .catch(e => null); // Ignore because bucket policy will always delete these images anyways.
+};
 
 export const createToppingImageSingedUrl: ApiGatewayHandler = async (event) => {
   const body = deserialize(UploadToppingImageBody, event.body);
@@ -95,25 +106,8 @@ export const createTopping: ApiGatewayHandler = async (event) => {
   }
 
   const [match, ext] = image.filename.match(imageFileNameRegExp);
-  /*
-  const existingImage = await s3.headObject({Bucket: TOPPINGS_S3_BUCKET, Key: filename}).promise().catch(e => null);
-  if (existingTopping) {
-    const error = {
-      type: 'Conflict',
-      message: 'An image with that name already exists!'
-    };
-    return apiGatewayUtil.sendJson({statusCode: 401, body: {error}});
-  }
-  */
-
   try {
-    await s3.copyObject({
-      CopySource: `${TOPPINGS_S3_BUCKET}/${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`,
-      Bucket: TOPPINGS_S3_BUCKET,
-      Key: `${name}.${ext}`,
-      ACL: 'public-read'
-    }).promise();
-    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: `${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`}).promise();
+    await updateImage({image, name, ext});
   } catch (e) {
     const error = {
       type: 'Upload Failure',
@@ -151,6 +145,7 @@ export const deleteTopping: ApiGatewayHandler = async (event) => {
     const {image} = value;
     await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();
   }
+  // TODO: Remove toppings from pizza's (fun -> trigger function from pizza group!)
   return apiGatewayUtil.sendJson({statusCode: value ? 204 : 404});
 };
 
@@ -180,14 +175,9 @@ export const updateTopping: ApiGatewayHandler = async (event) => {
   }
 
   const {name, type, image} = body;
-  const [match, contentType, ext, base64data] = image.dataUrl.match(dataUrlRegExp);
+  const [match, ext] = image.filename.match(imageFileNameRegExp);
   try {
-    await s3.putObject({
-      Bucket: TOPPINGS_S3_BUCKET,
-      Key: `${name}.${ext}`,
-      ContentType: contentType,
-      Body: Buffer.from(base64data, 'base64')
-    }).promise();
+    await updateImage({image, name, ext});
   } catch (e) {
     const error = {
       type: 'Upload Failure',
@@ -195,6 +185,7 @@ export const updateTopping: ApiGatewayHandler = async (event) => {
     };
     return apiGatewayUtil.sendJson({statusCode: 500, body: {error}});
   }
+
   const setMongoTopping: MongoTopping = {
     name,
     type,

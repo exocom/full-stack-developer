@@ -9,6 +9,8 @@ const AWS = require('aws-sdk');
 const {StandaloneLocalDevServer} = require('@kalarrs/serverless-local-dev-server/src/StandaloneLocalDevServer');
 const {readFile} = require('fs').promises;
 const moment = require('moment');
+const {imageFileNameRegExp} = require('../src/models/request');
+const {ToppingType} = require('../src/models/topping');
 
 const serverlessLocalServer = new StandaloneLocalDevServer({
   projectPath: join(__dirname, '../'),
@@ -23,9 +25,6 @@ const bucketUrl = ({bucket, key}) => {
   return `https://${bucket}.s3.amazonaws.com/${key.replace(/^temp\//, '')}`;
 };
 
-
-const {dataUrlRegExp} = require('../src/models/request');
-const {ToppingType} = require('../src/models/topping');
 
 describe('toppings', () => {
   const testData = {
@@ -87,7 +86,6 @@ describe('toppings', () => {
     };
 
     before(() => {
-      awsMock.remock('S3', 'putObject', {mock: true, ETag: '2'});
       awsMock.remock('S3', 'copyObject', {
         mock: true,
         CopyObjectResult: {
@@ -112,12 +110,12 @@ describe('toppings', () => {
       }));
     });
   });
-  return;
+
   describe('create a topping with missing name', () => {
-    const imageExt = 'png';
+    const filename = 'noname.png';
     const requestBody = {
       type: ToppingType.Seasoning,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -141,11 +139,11 @@ describe('toppings', () => {
   });
 
   describe('create a topping with missing type', () => {
-    const imageExt = 'png';
     const name = 'pepperoni';
+    const filename = 'pepperoni.png';
     const requestBody = {
       name,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -168,12 +166,12 @@ describe('toppings', () => {
   });
 
   describe('create a topping with invalid type', () => {
-    const imageExt = 'png';
     const name = 'pepperoni';
+    const filename = 'pepperoni.png';
     const requestBody = {
       name,
       type: 'garlic',
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -196,12 +194,12 @@ describe('toppings', () => {
   });
 
   describe('create a topping with name that is too short', () => {
-    const imageExt = 'png';
     const name = 'ta';
+    const filename = 'ta.png';
     const requestBody = {
       name,
       type: ToppingType.Seasoning,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -225,12 +223,12 @@ describe('toppings', () => {
   });
 
   describe('create a topping with name that is too long', () => {
-    const imageExt = 'png';
     const name = 'pepppppppppppppoooorrrrrnnnniiiiiiii';
+    const filename = 'pepppppppppppppoooorrrrrnnnniiiiiiii.png';
     const requestBody = {
       name,
       type: ToppingType.Meat,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -278,7 +276,7 @@ describe('toppings', () => {
     });
   });
 
-  describe('create a topping with image that has no dataUrl', () => {
+  describe('create a topping with image that has no filename', () => {
     const name = 'pepperoni';
     const requestBody = {
       name,
@@ -301,20 +299,21 @@ describe('toppings', () => {
       assert.isArray(imageError.children);
 
       const [imageDataError] = imageError.children;
-      const prop = 'dataUrl';
+      const prop = 'filename';
       assert.equal(imageDataError.property, prop);
       assert.equal(imageDataError.constraints.isDefined, `${prop} should not be null or undefined`);
-      assert.equal(imageDataError.constraints.matches, `${prop} must match ${dataUrlRegExp} regular expression`);
+      assert.equal(imageDataError.constraints.matches, `${prop} must match ${imageFileNameRegExp} regular expression`);
 
     });
   });
 
-  describe('create a topping with invalid image dataUrl', () => {
+  describe('create a topping with invalid image filename', () => {
     const name = 'pepperoni';
+    const filename = 'pepperoni';
     const requestBody = {
       name,
       type: ToppingType.Meat,
-      image: {dataUrl: 'foo'}
+      image: {filename}
     };
 
     it('should return validation errors', async () => {
@@ -332,23 +331,23 @@ describe('toppings', () => {
       assert.isArray(imageError.children);
 
       const [imageDataError] = imageError.children;
-      const prop = 'dataUrl';
+      const prop = 'filename';
       assert.equal(imageDataError.property, prop);
       assert.isUndefined(imageDataError.constraints.isDefined);
-      assert.equal(imageDataError.constraints.matches, `${prop} must match ${dataUrlRegExp} regular expression`);
+      assert.equal(imageDataError.constraints.matches, `${prop} must match ${imageFileNameRegExp} regular expression`);
     });
   });
 
   describe('create a topping with the same name as an existing topping', () => {
-    const imageExt = 'png';
     const name = 'sausage';
+    const filename = 'sausage.png';
     const requestBody = {
       name,
       type: ToppingType.Meat,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      image: {filename}
     };
 
-    it('should return a new topping', async () => {
+    it('should return validation errors', async () => {
       const {createTopping} = handler;
       const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
       assert.equal(statusCode, 401);
@@ -360,30 +359,68 @@ describe('toppings', () => {
     });
   });
 
-  // NOTE: Something with the s3 mock is not working when this is run with other tests. Works when run alone.
-  describe.skip('create a topping, but then fails to save image to s3', () => {
-    const imageExt = 'png';
+  describe('create a topping, but then fails to copy image out of temp', () => {
     const name = 'ham';
+    const filename = 'ham.png';
     const requestBody = {
       name,
-      image: {dataUrl: `data:image/${imageExt};base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=`}
+      type: ToppingType.Meat,
+      image: {filename}
     };
 
-    beforeEach(async () => {
-      // await awsMock.restore('S3');
-      await awsMock.mock('S3', 'putObject', (param, cb) => {
-        cb(new Error('failed for some reason!'))
+    before(async () => {
+      awsMock.remock('S3', 'copyObject', (param, cb) => {
+        cb(new Error('failed to copy'))
       });
     });
 
     it('should return a server error', async () => {
       const {createTopping} = handler;
-      const {body} = await createTopping({body: JSON.stringify(requestBody)});
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      // assert.equal(statusCode, 201);
       assert.isString(body);
 
       const {error} = JSON.parse(body);
       assert.equal(error.type, 'Upload Failure');
       assert.equal(error.message, 'Unable to save the image.');
+    });
+  });
+
+  describe('create a topping, but then fails to remove image from temp', () => {
+    const name = 'ham';
+    const filename = 'ham.png';
+    const requestBody = {
+      name,
+      type: ToppingType.Meat,
+      image: {filename}
+    };
+
+    before(async () => {
+      awsMock.remock('S3', 'copyObject', {
+        mock: true,
+        CopyObjectResult: {
+          ETag: "\"25f2f54b3c108fbf1b4472154072ea38\"",
+          LastModified: moment().toISOString()
+        }
+      });
+      awsMock.remock('S3', 'deleteObject', (param, cb) => {
+        cb(false)
+      });
+    });
+
+    it('should return a new topping', async () => {
+      const {createTopping} = handler;
+      const {body, statusCode} = await createTopping({body: JSON.stringify(requestBody)});
+      assert.equal(statusCode, 201);
+      assert.isString(body);
+
+      const {data} = JSON.parse(body);
+      assert.equal(data.name, requestBody.name);
+      assert.equal(data.type, requestBody.type);
+      assert.equal(data.image.url, bucketUrl({
+        bucket: process.env.TOPPINGS_S3_BUCKET,
+        key: filename
+      }));
     });
   });
 
@@ -423,6 +460,8 @@ describe('toppings', () => {
       assert.isEmpty(body);
     });
   });
+
+  return;
 
   describe('update an existing topping', () => {
     const name = 'onion';
