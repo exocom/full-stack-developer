@@ -29,7 +29,7 @@ export class ToppingModalComponent implements OnInit {
   toppingTypes = ToppingType;
 
   imageFormGroup = this.fb.group({
-    filename: [null],
+    filename: [null, Validators.required],
     url: [null]
   });
   toppingFormGroup = this.fb.group({
@@ -108,8 +108,6 @@ export class ToppingModalComponent implements OnInit {
         this.loading.toppingValidation = false;
         this.toppingFormGroup.enable();
       }, async (res) => {
-        console.log(res);
-        debugger;
         const message = res && res.error && res.error.error && res.error.error.message || 'Important message goes here!';
         const toast = await this.toastCtrl.create({
           color: 'danger',
@@ -146,13 +144,17 @@ export class ToppingModalComponent implements OnInit {
     return this.uploadImage({filename, mimeType}, {base64str});
   }
 
+  removeImage() {
+    this.imageFormGroup.patchValue({filename: null, url: null});
+  }
+
   async save() {
     this.loading.toppingUpdate = false;
     if (this.toppingFormGroup.invalid) {
       const toast = await this.toastCtrl.create({
         color: 'danger',
         cssClass: 'annoyed',
-        message: 'Form is invalid!\nPlease correct issues and try again.',
+        message: 'Form is invalid!\nCorrect issues and try again.',
         showCloseButton: true
       });
       return toast.present();

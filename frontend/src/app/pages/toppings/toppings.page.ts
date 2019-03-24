@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {PizzaStoreService} from '../../services/pizza-store.service';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {Defaults, Topping, ToppingType} from '../../services/contract/models/topping';
 import {AlertController, ModalController, ToastController} from '@ionic/angular';
 import {ToppingModalComponent} from '../../modals/topping/topping-modal.component';
@@ -11,7 +11,19 @@ import {ToppingModalComponent} from '../../modals/topping/topping-modal.componen
   styleUrls: ['./toppings.page.scss']
 })
 export class ToppingsPage implements OnInit {
-  toppings$ = this.pizzaStoreService.getToppings();
+
+
+  // modalOpen = false;
+
+  toppings$ = this.pizzaStoreService.getToppings()
+
+    // .pipe(tap(toppings => {
+    //   if (!this.modalOpen) {
+    //     this.editTopping(toppings[0]);
+    //     this.modalOpen = true;
+    //   }
+    // }));
+
   toppingsGroupByType$ = this.toppings$.pipe(
     map((toppings) => {
       return Object.values(ToppingType).map((toppingType): { type: ToppingType, toppings: Array<Topping> } => {
@@ -30,7 +42,7 @@ export class ToppingsPage implements OnInit {
   }
 
   async ngOnInit() {
-    setTimeout(() => this.createTopping(), 200);
+    // setTimeout(() => this.createTopping(), 200);
 
     // const toast = await this.toastCtrl.create({
     //   color: 'secondary',
