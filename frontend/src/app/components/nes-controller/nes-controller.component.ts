@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
 import {Button} from 'selenium-webdriver';
+import {AudioService} from '../../services/audio.service';
 
 export type Button = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Start' | 'Select' | 'A' | 'B';
 
@@ -54,7 +55,7 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
     }
   };
 
-  constructor() {
+  constructor(private audioService: AudioService) {
     window.addEventListener('keydown', this.keyDown);
   }
 
@@ -70,21 +71,12 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
       {key: 'B', ref: this.bAudio}
     ];
 
-    // @ts-ignore
-    const isWebkitAudioContext = !!window.webkitAudioContext;
-    // @ts-ignore
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) {
-      return;
-    }
-    const singletonAudioContext = new AC();
-
     this.audioMap = audioElements.reduce((obj, {key, ref}, i) => {
       const audioElement = ref.nativeElement;
       if (!audioElement) {
         return;
       }
-      const audioContext = isWebkitAudioContext ? singletonAudioContext : new AC();
+      const {audioContext} = this.audioService;
       const track = audioContext.createMediaElementSource(audioElement);
       track.connect(audioContext.destination);
 
