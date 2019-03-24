@@ -17,11 +17,13 @@ provider:
     MONGO_URI: ${file(../serverless.yml):provider.environment.MONGO_URI}
     TOPPING_COLLECTION: ${file(../serverless.yml):provider.environment.TOPPING_COLLECTION}
     TOPPINGS_S3_BUCKET: ${cf:full-stack-developer-workspace-${file(../serverless.yml):provider.stage}.ToppingsBucketName}
+    TOPPING_TEMP_IMAGE_PREFIX: "temp"
 
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "s3:GetObject"
+        - "s3:DeleteObject"
         - "s3:PutObject"
         - "s3:PutObjectAcl"
       Resource:

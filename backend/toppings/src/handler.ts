@@ -28,7 +28,7 @@ import {
 
 export const aws = AWS; // Used for mocking AWS in tests.
 
-const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET, AWS_REGION} = process.env;
+const {MONGO_URI, TOPPING_COLLECTION, TOPPINGS_S3_BUCKET, TOPPING_TEMP_IMAGE_PREFIX, AWS_REGION} = process.env;
 const s3 = new S3();
 const rekognition = new Rekognition({region: AWS_REGION || 'us-west-2'});
 const apiGatewayUtil = new ApiGatewayUtil();
@@ -60,7 +60,7 @@ export const createToppingImageSingedUrl: ApiGatewayHandler = async (event) => {
   const signedUrl = s3.getSignedUrl('putObject', {
     Expires: 60,
     Bucket: TOPPINGS_S3_BUCKET,
-    Key: `temp/${filename}`, // upload to temp, then setup rule on temp to remove after 5 min.
+    Key: `${TOPPING_TEMP_IMAGE_PREFIX}/${filename}`, // upload with prefix. Allows easy setup for rule to remove after 5 min.
     ContentType: contentType,
     ACL: 'public-read'
   });
@@ -108,12 +108,12 @@ export const createTopping: ApiGatewayHandler = async (event) => {
 
   try {
     await s3.copyObject({
-      CopySource: `${TOPPINGS_S3_BUCKET}/temp/${image.filename}`,
+      CopySource: `${TOPPINGS_S3_BUCKET}/${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`,
       Bucket: TOPPINGS_S3_BUCKET,
       Key: `${name}.${ext}`,
       ACL: 'public-read'
     }).promise();
-    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: image.filename}).promise();
+    await s3.deleteObject({Bucket: TOPPINGS_S3_BUCKET, Key: `${TOPPING_TEMP_IMAGE_PREFIX}/${image.filename}`}).promise();
   } catch (e) {
     const error = {
       type: 'Upload Failure',
