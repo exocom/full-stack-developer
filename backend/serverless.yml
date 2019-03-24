@@ -12,7 +12,14 @@ resources:  # CloudFormation template syntax
     ToppingsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        # Set the CORS policy
+        LifecycleConfiguration:
+          Rules:
+            - Id: CleanupTemp
+              Prefix: temp
+              Status: Enabled
+              AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 1
+              ExpirationInDays: 1
         CorsConfiguration:
           CorsRules:
             - AllowedOrigins:
