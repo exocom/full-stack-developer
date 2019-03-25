@@ -1,7 +1,7 @@
 import {ToppingType} from './topping';
 import {CrustType, PizzaSize} from './pizza';
 
-export const dataUrlRegExp = /^data:(.*?\/(.*?));(.*$)/;
+export const dataUrlRegExp = /^data:(.*?\/(.*?));base64,(.*$)/;
 
 export class ImageRequest {
   filename: string;

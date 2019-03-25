@@ -41,7 +41,7 @@ export class ToppingModalComponent implements OnInit {
 
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
-  toppingDataUrl: string | ArrayBuffer;
+  tempImageData: string | ArrayBuffer;
 
   constructor(private fb: FormBuilder,
               private modalController: ModalController,
@@ -60,7 +60,7 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  private async uploadImage({filename, mimeType}, {file, base64str}: ImageUpload) {
+  private async uploadImage({filename, mimeType}, {file, blob}: ImageUpload) {
     this.loading.toppingImage = true;
     this.loading.toppingValidation = false;
     this.toppingFormGroup.disable();
@@ -80,7 +80,7 @@ export class ToppingModalComponent implements OnInit {
     this.pizzaStoreService.createToppingImageSignedUrl({filename, mimeType})
       .pipe(
         switchMap((signedUrl) => {
-          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, base64str}).pipe(
+          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, blob}).pipe(
             tap(() => {
               this.loading.toppingImage = false;
               this.loading.toppingValidation = true;
@@ -129,19 +129,25 @@ export class ToppingModalComponent implements OnInit {
     this.loading.toppingImage = true;
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      this.toppingDataUrl = fileReader.result;
+      this.tempImageData = fileReader.result;
     };
     fileReader.readAsDataURL(file);
     const mimeType = getMIMEType(file.name);
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processPhoto(dataUrl: string) {
+  processDatUrl(dataUrl: string) {
     this.loading.toppingImage = true;
-    this.toppingDataUrl = dataUrl;
+    this.tempImageData = dataUrl;
     const [match, mimeType, ext, base64str] = dataUrl.match(dataUrlRegExp);
     const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
-    return this.uploadImage({filename, mimeType}, {base64str});
+    const binary = atob(base64str);
+    const array = [];
+    for(let i = 0; i < binary.length; i++) {
+      array.push(binary.charCodeAt(i));
+    }
+    const blob = new Blob([new Uint8Array(array)], {type: mimeType});
+    return this.uploadImage({filename, mimeType}, {blob});
   }
 
   removeImage() {

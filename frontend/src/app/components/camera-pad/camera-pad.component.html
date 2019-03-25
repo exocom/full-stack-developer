@@ -4,7 +4,7 @@
   <audio #cameraAudio src="/assets/audio/camera-shutter-click.mp3" type="audio/mpeg"></audio>
   <ng-container *ngIf="(cameraPermissions$ | async)?.state === 'granted' else noPermissions">
     <ion-fab-button color="light" (click)="takePhoto(video)" size="small">
-      <ion-icon size="large" name="radio-button-off"></ion-icon>
+      <ion-icon size="large" name="aperture"></ion-icon>
     </ion-fab-button>
   </ng-container>
 

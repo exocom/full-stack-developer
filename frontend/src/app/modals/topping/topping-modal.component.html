@@ -9,25 +9,20 @@
 
 <ion-content scrollY="false">
   <form [formGroup]="toppingFormGroup" flex-row>
-    <!--
-    <div formGroupName="image" class="image-group">
-      <ng-container *ngIf="urlFormControl.value || dataUrlFormControl.value else noImage">
-        <ion-img [src]="urlFormControl.value || dataUrlFormControl.value"></ion-img>
+    <div formGroupName="image" class="image-group" [class.fix-loading-bottom]="!loading.toppingImage">
+      <ng-container *ngIf="urlFormControl.value || tempImageData else noImage">
+        <ion-img [src]="urlFormControl.value || tempImageData" [class.scanning]="loading.toppingValidation"></ion-img>
       </ng-container>
 
       <ng-template #noImage>
-        <app-camera-pad *ngIf="!toppingDataUrl" (photoCaptured)="processPhoto($event)"></app-camera-pad>
-        <ion-img *ngIf="toppingDataUrl" [src]="toppingDataUrl"
-                 [class.scanning]="loading.toppingValidation"></ion-img>
+        <app-camera-pad (photoCaptured)="processDatUrl($event)"></app-camera-pad>
       </ng-template>
-      <ion-input type="hidden" formControlName="dataUrl"></ion-input>
     </div>
-    -->
 
-    <div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
-      <ion-item-sliding lines="none" *ngIf="urlFormControl.value else noImage">
+    <!--<div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
+      <ion-item-sliding lines="none" *ngIf="urlFormControl.value || tempImageData else noImage">
         <ion-item no-padding no-margin flex>
-          <ion-img [src]="urlFormControl.value" [class.scanning]="loading.toppingValidation"></ion-img>
+          <ion-img [src]="urlFormControl.value || tempImageData" [class.scanning]="loading.toppingValidation"></ion-img>
         </ion-item>
 
         <ion-item-options side="end">
@@ -40,7 +35,7 @@
       <ng-template #noImage>
         <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
       </ng-template>
-    </div>
+    </div>-->
     <ion-progress-bar *ngIf="loading.toppingImage" type="indeterminate" color="tertiary"></ion-progress-bar>
 
     <ion-item>
