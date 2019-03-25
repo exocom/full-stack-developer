@@ -10,7 +10,9 @@ import {CameraService} from '../../services/camera.service';
 export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
   @ViewChild('cameraAudio') cameraAudio: ElementRef<HTMLAudioElement>;
-  @Output() photoCaptured = new EventEmitter<{ same: string; inverse: string; both: string}>();
+  // TODO : if testing reveals no SKEW then set back to single output!
+  @Output() photoCaptured = new EventEmitter<{ same: string; inverse: string; both: string }>();
+  isPortrait = true;
 
   mediaStream: MediaStream;
   videoTrack: MediaStreamTrack;
@@ -77,6 +79,24 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private orientationChange() {
+    if (screen && screen.orientation && screen.orientation.type) {
+      this.isPortrait = screen && screen.orientation && screen.orientation.type ? !/landscape/gi.test(screen.orientation.type) : true;
+    } else {
+      const orientation = screen && screen.orientation && screen.orientation.hasOwnProperty('angle')
+        ? screen.orientation.angle
+        : window.orientation;
+      switch (orientation) {
+        case 0: // Portrait
+        case 180: // Portrait (Upside-down)
+          this.isPortrait = true;
+          break;
+        case -90: // Landscape (Clockwise)
+        case 90: // Landscape  (Counterclockwise)
+          this.isPortrait = false;
+          break;
+      }
+    }
+
     if (!(this.videoTrack && this.video && this.mediaStream)) {
       return;
     }
@@ -94,14 +114,6 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   async takePhoto(video: HTMLVideoElement) {
-    const canvas = document.createElement('canvas');
-    const canvas2 = document.createElement('canvas');
-    const canvas3 = document.createElement('canvas');
-
-    const context = canvas.getContext('2d');
-    const context2 = canvas2.getContext('2d');
-    const context3 = canvas3.getContext('2d');
-
     const {width, height} = this.videoTrack.getSettings();
     const isPortrait = window.innerHeight > window.innerWidth;
     const isMobileOrTablet = false;
@@ -109,20 +121,25 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     const w = isMobileOrTablet && isPortrait ? height : width;
     const h = isMobileOrTablet && isPortrait ? width : height;
 
-    canvas.width = w;
-    canvas.height = h;
+    const photoDataUrls = [
+      {name: 'same', canvasWidth: w, canvasHeight: h, drawImageWidth: w, drawImageHeight: h},
+      {name: 'inverse', canvasWidth: h, canvasHeight: w, drawImageWidth: h, drawImageHeight: w},
+      {name: 'both', canvasWidth: w > h ? w : h, canvasHeight: h + w, drawImageWidth: w, drawImageHeight: h}
+    ].reduce((photos, {name, canvasWidth, canvasHeight, drawImageWidth, drawImageHeight}) => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
 
-    context.drawImage(video, 0, 0, w, h);
-    const dataUrl = canvas.toDataURL('image/png');
+      context.drawImage(video, 0, 0, drawImageWidth, drawImageHeight);
+      if (name === 'both') {
+        context.drawImage(video, 0, drawImageHeight, drawImageHeight, drawImageWidth);
+      }
+      photos[name] = canvas.toDataURL('image/png');
+      return photos;
+    }, {same: null, inverse: null, both: null});
 
-    context2.drawImage(video, 0, 0, h, w);
-    const dataUrlInverse = canvas2.toDataURL('image/png');
-
-    context3.drawImage(video, 0, 0, w, h);
-    context3.drawImage(video, h, 0, h, w);
-    const dataUrlBoth = canvas3.toDataURL('image/png');
-
-    this.photoCaptured.next({same: dataUrl, inverse: dataUrlInverse, both: dataUrlBoth});
+    this.photoCaptured.next(photoDataUrls);
 
     if (!this.cameraAudioMap) {
       return;

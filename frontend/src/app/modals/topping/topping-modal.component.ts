@@ -144,7 +144,7 @@ export class ToppingModalComponent implements OnInit {
     Object.keys(photos).forEach(key => {
       const dataUrl = photos[key];
       const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
-      const filename = `${key}-${name}.${ext}`;
+      const filename = `${name}-${key}-${screen && screen.orientation && screen.orientation.type || 'none'}.${ext}`;
       const blob = dataUrlToBlob(dataUrl);
       return this.uploadImage({filename, mimeType}, {blob});
     });
