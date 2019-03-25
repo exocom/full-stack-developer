@@ -140,10 +140,11 @@ export class ToppingModalComponent implements OnInit {
     this.loading.toppingImage = true;
     this.tempImageData = photos.both;
 
+    const name = this.toppingFormGroup.value.name || randomString(8);
     Object.keys(photos).forEach(key => {
       const dataUrl = photos[key];
       const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
-      const filename = `${key}-${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
+      const filename = `${key}-${name}.${ext}`;
       const blob = dataUrlToBlob(dataUrl);
       return this.uploadImage({filename, mimeType}, {blob});
     });

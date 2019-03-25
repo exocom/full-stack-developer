@@ -133,10 +133,11 @@ export class PizzaModalComponent implements OnInit {
     this.loading.pizzaImage = true;
     this.pizzaDataUrl = photos.both;
 
+    const name = this.pizzaFormGroup.value.name || randomString(8);
     Object.keys(photos).forEach(key => {
       const dataUrl = photos[key];
       const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
-      const filename = `${key}-${this.pizzaFormGroup.value.name || randomString(8)}.${ext}`;
+      const filename = `${key}-${name}.${ext}`;
       const blob = dataUrlToBlob(dataUrl);
       this.uploadImage({filename, mimeType}, {blob});
     });
