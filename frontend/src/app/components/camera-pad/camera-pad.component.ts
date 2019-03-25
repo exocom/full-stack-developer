@@ -10,7 +10,7 @@ import {CameraService} from '../../services/camera.service';
 export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
   @ViewChild('cameraAudio') cameraAudio: ElementRef<HTMLAudioElement>;
-  @Output() photoCaptured = new EventEmitter<string>();
+  @Output() photoCaptured = new EventEmitter<{ same: string; inverse: string; both: string}>();
 
   mediaStream: MediaStream;
   videoTrack: MediaStreamTrack;
@@ -95,7 +95,12 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async takePhoto(video: HTMLVideoElement) {
     const canvas = document.createElement('canvas');
+    const canvas2 = document.createElement('canvas');
+    const canvas3 = document.createElement('canvas');
+
     const context = canvas.getContext('2d');
+    const context2 = canvas2.getContext('2d');
+    const context3 = canvas3.getContext('2d');
 
     const {width, height} = this.videoTrack.getSettings();
     const isPortrait = window.innerHeight > window.innerWidth;
@@ -109,7 +114,15 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
 
     context.drawImage(video, 0, 0, w, h);
     const dataUrl = canvas.toDataURL('image/png');
-    this.photoCaptured.next(dataUrl);
+
+    context2.drawImage(video, 0, 0, h, w);
+    const dataUrlInverse = canvas2.toDataURL('image/png');
+
+    context3.drawImage(video, 0, 0, w, h);
+    context3.drawImage(video, h, 0, h, w);
+    const dataUrlBoth = canvas3.toDataURL('image/png');
+
+    this.photoCaptured.next({same: dataUrl, inverse: dataUrlInverse, both: dataUrlBoth});
 
     if (!this.cameraAudioMap) {
       return;

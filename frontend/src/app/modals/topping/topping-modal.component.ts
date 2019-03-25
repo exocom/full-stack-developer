@@ -7,7 +7,7 @@ import {getMIMEType} from 'mim';
 import {ImageMimeTypes, ImageUpload} from '../../models/images';
 import {switchMap, tap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
-import {randomString} from '../../common/string';
+import {dataUrlToBlob, randomString} from '../../common/string';
 
 interface Loading {
   toppingValidation: boolean;
@@ -136,18 +136,17 @@ export class ToppingModalComponent implements OnInit {
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processDatUrl(dataUrl: string) {
+  processDatUrl(photos) {
     this.loading.toppingImage = true;
-    this.tempImageData = dataUrl;
-    const [match, mimeType, ext, base64str] = dataUrl.match(dataUrlRegExp);
-    const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
-    const binary = atob(base64str);
-    const array = [];
-    for(let i = 0; i < binary.length; i++) {
-      array.push(binary.charCodeAt(i));
-    }
-    const blob = new Blob([new Uint8Array(array)], {type: mimeType});
-    return this.uploadImage({filename, mimeType}, {blob});
+    this.tempImageData = photos.both;
+
+    Object.keys(photos).forEach(key => {
+      const dataUrl = photos[key];
+      const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
+      const filename = `${key}-${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
+      const blob = dataUrlToBlob(dataUrl);
+      return this.uploadImage({filename, mimeType}, {blob});
+    });
   }
 
   removeImage() {

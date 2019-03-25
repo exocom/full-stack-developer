@@ -7,7 +7,7 @@ import {getMIMEType} from 'mim';
 import {ImageMimeTypes, ImageUpload} from '../../models/images';
 import {switchMap, tap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
-import {randomString} from '../../common/string';
+import {dataUrlToBlob, randomString} from '../../common/string';
 
 interface Loading {
   pizzaValidation: boolean;
@@ -66,7 +66,7 @@ export class PizzaModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  private async uploadImage({filename, mimeType}, {file, base64str}: ImageUpload) {
+  private async uploadImage({filename, mimeType}, {file, blob}: ImageUpload) {
     this.loading.pizzaImage = true;
     this.loading.pizzaValidation = false;
     this.pizzaFormGroup.disable();
@@ -86,7 +86,7 @@ export class PizzaModalComponent implements OnInit {
     this.pizzaStoreService.createPizzaImageSignedUrl({filename, mimeType})
       .pipe(
         switchMap((signedUrl) => {
-          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, base64str}).pipe(
+          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, blob}).pipe(
             tap(() => {
               this.loading.pizzaImage = false;
               this.loading.pizzaValidation = true;
@@ -129,12 +129,17 @@ export class PizzaModalComponent implements OnInit {
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processPhoto(dataUrl: string) {
+  processPhoto(photos) {
     this.loading.pizzaImage = true;
-    this.pizzaDataUrl = dataUrl;
-    const [match, mimeType, ext, base64str] = dataUrl.match(dataUrlRegExp);
-    const filename = `${this.pizzaFormGroup.value.name || randomString(8)}.${ext}`;
-    return this.uploadImage({filename, mimeType}, {base64str});
+    this.pizzaDataUrl = photos.both;
+
+    Object.keys(photos).forEach(key => {
+      const dataUrl = photos[key];
+      const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
+      const filename = `${key}-${this.pizzaFormGroup.value.name || randomString(8)}.${ext}`;
+      const blob = dataUrlToBlob(dataUrl);
+      this.uploadImage({filename, mimeType}, {blob});
+    });
   }
 
   removeImage() {
