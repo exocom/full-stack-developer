@@ -18,7 +18,23 @@ export class AudioService {
   }
 
   async getBuffer(path): Promise<AudioBuffer> {
-    const data = await this.http.get('path', {responseType: 'arraybuffer'}).toPromise();
-    return this.audioContext.decodeAudioData(data);
+    const data = await this.http.get(path, {responseType: 'arraybuffer'}).toPromise();
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      return this.audioContext.decodeAudioData(data, resolve, reject);
+    });
+  }
+
+  playFromBuffer(buffer) {
+    const source = this.audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(this.audioContext.destination);
+    source.start(0);
+
+    const ended = () => {
+      console.log('ALL DONE!');
+      source.removeEventListener('ended', ended);
+    };
+
+    source.addEventListener('ended', ended);
   }
 }

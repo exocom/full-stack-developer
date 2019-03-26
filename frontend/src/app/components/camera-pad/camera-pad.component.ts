@@ -1,23 +1,23 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CameraService} from '../../services/camera.service';
+import {AudioService} from '../../services/audio.service';
 
 @Component({
   selector: 'app-camera-pad',
   templateUrl: './camera-pad.component.html',
   styleUrls: ['./camera-pad.component.scss']
 })
-export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CameraPadComponent implements OnInit, OnDestroy {
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
-  @ViewChild('audioElement') audioElement: ElementRef<HTMLAudioElement>;
   @Output() photoCaptured = new EventEmitter<string>();
-  isPortrait = true;
 
+  isPortrait = true;
   mediaStream: MediaStream;
   videoTrack: MediaStreamTrack;
   cameraPermissions$: Observable<PermissionStatus> = this.cameraService.getCameraPermissionStatus();
   hasCameraHardware: Readonly<boolean> = this.cameraService.hasCameraHardware;
-  dataUrl: string;
+  shutterBuffer: AudioBuffer;
 
   private orientationChange = () => {
     if (screen && screen.orientation && screen.orientation.type) {
@@ -53,15 +53,10 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   };
 
-  private next = () => {
-    this.photoCaptured.next(this.dataUrl);
-    this.dataUrl = null;
-  };
-
-  constructor(private cameraService: CameraService, private elementRef: ElementRef) {
+  constructor(private audioService: AudioService, private cameraService: CameraService, private elementRef: ElementRef) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.cameraPermissions$.subscribe(async permissionStatus => {
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {width: 1280, facingMode: 'environment'},
@@ -78,10 +73,8 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
       window.addEventListener('orientationchange', this.orientationChange, false);
       window.addEventListener('resize', this.orientationChange, false);
     });
-  }
 
-  ngAfterViewInit() {
-    this.audioElement.nativeElement.addEventListener('ended', this.next);
+    this.shutterBuffer = await this.audioService.getBuffer('/assets/audio/camera-shutter-click.mp3');
   }
 
   ngOnDestroy(): void {
@@ -91,22 +84,22 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.videoTrack && this.videoTrack.stop) {
       this.videoTrack.stop();
     }
-    if (this.audioElement && this.audioElement.nativeElement) {
-      this.audioElement.nativeElement.removeEventListener('ended', this.next);
-    }
     window.removeEventListener('orientationchange', this.orientationChange);
     window.removeEventListener('resize', this.orientationChange);
   }
 
-  async takePhoto(video: HTMLVideoElement) {
+  async takePhoto() {
     const {width, height} = this.videoTrack.getSettings();
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     canvas.width = width;
     canvas.height = height;
-    context.drawImage(video, 0, 0, width, height);
-    this.dataUrl = canvas.toDataURL('image/png');
+    context.drawImage(this.video.nativeElement, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/png');
 
-    await this.audioElement.nativeElement.play();
+    if (this.shutterBuffer) {
+      this.audioService.playFromBuffer(this.shutterBuffer);
+    }
+    this.photoCaptured.next(dataUrl);
   }
 }

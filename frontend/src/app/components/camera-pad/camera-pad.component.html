@@ -1,9 +1,8 @@
 <ng-container *ngIf="hasCameraHardware else noCamera">
 
   <video #video autoplay playsinline muted [class.hidden]="(cameraPermissions$ | async)?.state !== 'granted'"></video>
-  <audio #audioElement src="/assets/audio/camera-shutter-click.mp3" type="audio/mpeg"></audio>
   <ion-fab *ngIf="(cameraPermissions$ | async)?.state === 'granted' else noPermissions" [vertical]="isPortrait ? 'bottom' : 'center'" [horizontal]="isPortrait ? 'center' : 'end'">
-    <ion-fab-button color="light" (click)="takePhoto(video)" size="small" >
+    <ion-fab-button color="light" (click)="takePhoto($event)" size="small" >
       <ion-icon size="large" name="aperture"></ion-icon>
     </ion-fab-button>
   </ion-fab>
