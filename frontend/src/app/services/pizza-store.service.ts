@@ -19,8 +19,8 @@ export class PizzaStoreService {
   constructor(private pizzasService: PizzasService, private s3Service: S3Service, private toppingsService: ToppingsService) {
   }
 
-  uploadImage({signedUrl, mimeType}, {file, base64str}: ImageUpload) {
-    return this.s3Service.uploadToSignedUrl(signedUrl, mimeType, {file, base64str});
+  uploadImage({signedUrl, mimeType}, {file, blob}: ImageUpload) {
+    return this.s3Service.uploadToSignedUrl(signedUrl, mimeType, {file, blob});
   }
 
   createToppingImageSignedUrl({filename, mimeType}): Observable<string> {

@@ -7,7 +7,7 @@ import {getMIMEType} from 'mim';
 import {ImageMimeTypes, ImageUpload} from '../../models/images';
 import {switchMap, tap} from 'rxjs/operators';
 import {dataUrlRegExp} from '../../services/contract/models/request';
-import {randomString} from '../../common/string';
+import {dataUrlToBlob, randomString} from '../../common/string';
 
 interface Loading {
   toppingValidation: boolean;
@@ -41,7 +41,7 @@ export class ToppingModalComponent implements OnInit {
 
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
-  toppingDataUrl: string | ArrayBuffer;
+  tempImageData: string | ArrayBuffer;
 
   constructor(private fb: FormBuilder,
               private modalController: ModalController,
@@ -60,7 +60,7 @@ export class ToppingModalComponent implements OnInit {
     return this.modalController.dismiss(null);
   }
 
-  private async uploadImage({filename, mimeType}, {file, base64str}: ImageUpload) {
+  private async uploadImage({filename, mimeType}, {file, blob}: ImageUpload) {
     this.loading.toppingImage = true;
     this.loading.toppingValidation = false;
     this.toppingFormGroup.disable();
@@ -80,7 +80,7 @@ export class ToppingModalComponent implements OnInit {
     this.pizzaStoreService.createToppingImageSignedUrl({filename, mimeType})
       .pipe(
         switchMap((signedUrl) => {
-          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, base64str}).pipe(
+          return this.pizzaStoreService.uploadImage({signedUrl, mimeType}, {file, blob}).pipe(
             tap(() => {
               this.loading.toppingImage = false;
               this.loading.toppingValidation = true;
@@ -129,19 +129,22 @@ export class ToppingModalComponent implements OnInit {
     this.loading.toppingImage = true;
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      this.toppingDataUrl = fileReader.result;
+      this.tempImageData = fileReader.result;
     };
     fileReader.readAsDataURL(file);
     const mimeType = getMIMEType(file.name);
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processPhoto(dataUrl: string) {
+  processDataUrl(dataUrl) {
     this.loading.toppingImage = true;
-    this.toppingDataUrl = dataUrl;
-    const [match, mimeType, ext, base64str] = dataUrl.match(dataUrlRegExp);
-    const filename = `${this.toppingFormGroup.value.name || randomString(8)}.${ext}`;
-    return this.uploadImage({filename, mimeType}, {base64str});
+    this.tempImageData = dataUrl;
+
+    const name = this.toppingFormGroup.value.name || randomString(8);
+    const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
+    const filename = `${name}.${ext}`;
+    const blob = dataUrlToBlob(dataUrl);
+    return this.uploadImage({filename, mimeType}, {blob});
   }
 
   removeImage() {

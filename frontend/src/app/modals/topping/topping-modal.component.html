@@ -7,37 +7,23 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content scrollY="false">
+<ion-content>
   <form [formGroup]="toppingFormGroup" flex-row>
-    <!--
-    <div formGroupName="image" class="image-group">
-      <ng-container *ngIf="urlFormControl.value || dataUrlFormControl.value else noImage">
-        <ion-img [src]="urlFormControl.value || dataUrlFormControl.value"></ion-img>
-      </ng-container>
-
-      <ng-template #noImage>
-        <app-camera-pad *ngIf="!toppingDataUrl" (photoCaptured)="processPhoto($event)"></app-camera-pad>
-        <ion-img *ngIf="toppingDataUrl" [src]="toppingDataUrl"
-                 [class.scanning]="loading.toppingValidation"></ion-img>
-      </ng-template>
-      <ion-input type="hidden" formControlName="dataUrl"></ion-input>
-    </div>
-    -->
-
     <div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
-      <ion-item-sliding lines="none" *ngIf="urlFormControl.value else noImage">
-        <ion-item no-padding no-margin flex>
-          <ion-img [src]="urlFormControl.value" [class.scanning]="loading.toppingValidation"></ion-img>
+      <ion-item-sliding *ngIf="urlFormControl?.value || tempImageData else noImage">
+        <ion-item lines="none" no-padding no-margin flex>
+          <ion-img [src]="urlFormControl?.value || tempImageData"
+                   [class.scanning]="loading.toppingValidation"></ion-img>
         </ion-item>
-
         <ion-item-options side="end">
           <ion-item-option color="danger" (click)="removeImage()">
             <ion-icon name="trash" size="large"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-
       </ion-item-sliding>
+
       <ng-template #noImage>
+<!--        <app-camera-pad (photoCaptured)="processDataUrl($event)"></app-camera-pad>-->
         <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
       </ng-template>
     </div>

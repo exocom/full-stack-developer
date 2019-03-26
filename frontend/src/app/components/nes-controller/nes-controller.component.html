@@ -5,34 +5,25 @@
     <span class="grey"></span>
 
     <div class="mid-buttons">
-      <span class="select" (mousedown)="pushButton('Select')"> </span>
-      <audio #selectAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
-
-      <span class="start" (mousedown)="pushButton('Start')"> </span>
-      <audio #startAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+      <span class="select" (mousedown)="mouseDown($event, 'Select')" (touchstart)="touchStart($event,'Select')"> </span>
+      <span class="start" (mousedown)="mouseDown($event, 'Start')" (touchstart)="touchStart($event,'Start')"> </span>
     </div>
 
     <div class="dpad">
       <span class="plus"></span>
       <span class="plus2"></span>
 
-      <span class="thumb1" (mousedown)="pushButton('ArrowLeft')"></span>
-      <audio #leftAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
-
-      <span class="thumb2" (mousedown)="pushButton('ArrowUp')"></span>
-      <audio #upAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
-
-      <span class="thumb3" (mousedown)="pushButton('ArrowRight')"></span>
-      <audio #rightAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
-
-      <span class="thumb4" (mousedown)="pushButton('ArrowDown')"></span>
-      <audio #downAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+      <span class="thumb1" (mousedown)="mouseDown($event, 'ArrowLeft')"
+            (touchstart)="touchStart($event,'ArrowLeft')"></span>
+      <span class="thumb2" (mousedown)="mouseDown($event, 'ArrowUp')"
+            (touchstart)="touchStart($event,'ArrowUp')"></span>
+      <span class="thumb3" (mousedown)="mouseDown($event, 'ArrowRight')"
+            (touchstart)="touchStart($event,'ArrowRight')"></span>
+      <span class="thumb4" (mousedown)="mouseDown($event, 'ArrowDown')"
+            (touchstart)="touchStart($event,'ArrowDown')"></span>
     </div>
 
-    <span class="b" (mousedown)="pushButton('B')"></span>
-    <audio #bAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
-
-    <span class="a" (mousedown)="pushButton('A')"></span>
-    <audio #aAudio src="/assets/audio/click.mp3" type="audio/mpeg"></audio>
+    <span class="b" (mousedown)="mouseDown($event, 'B')" (touchstart)="touchStart($event,'B')"></span>
+    <span class="a" (mousedown)="mouseDown($event, 'A')" (touchstart)="touchStart($event,'A')"></span>
   </div>
 </div>

@@ -7,22 +7,23 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content scrollY="false" scrollX="false">
+<ion-content>
   <form [formGroup]="pizzaFormGroup" flex-row>
     <div flex flex-grow [class.fix-loading-bottom]="!loading.pizzaImage">
-      <ion-item-sliding lines="none" *ngIf="urlFormControl.value else noImage">
-        <ion-item no-padding no-margin flex>
-          <ion-img [src]="urlFormControl.value" [class.scanning]="loading.pizzaValidation"></ion-img>
+      <ion-item-sliding *ngIf="urlFormControl?.value || tempImageData else noImage">
+        <ion-item lines="none" no-padding no-margin flex>
+          <ion-img [src]="urlFormControl?.value || tempImageData"
+                   [class.scanning]="loading.pizzaValidation"></ion-img>
         </ion-item>
-
         <ion-item-options side="end">
           <ion-item-option color="danger" (click)="removeImage()">
             <ion-icon name="trash" size="large"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-
       </ion-item-sliding>
+
       <ng-template #noImage>
+<!--        <app-camera-pad (photoCaptured)="processDataUrl($event)"></app-camera-pad>-->
         <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
       </ng-template>
     </div>
