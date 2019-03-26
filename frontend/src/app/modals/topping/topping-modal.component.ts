@@ -136,18 +136,15 @@ export class ToppingModalComponent implements OnInit {
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processDatUrl(photos) {
+  processDatUrl(dataUrl) {
     this.loading.toppingImage = true;
-    this.tempImageData = photos.both;
+    this.tempImageData = dataUrl;
 
     const name = this.toppingFormGroup.value.name || randomString(8);
-    Object.keys(photos).forEach(key => {
-      const dataUrl = photos[key];
-      const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
-      const filename = `${name}-${key}-${screen && screen.orientation && screen.orientation.type || 'none'}.${ext}`;
-      const blob = dataUrlToBlob(dataUrl);
-      return this.uploadImage({filename, mimeType}, {blob});
-    });
+    const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
+    const filename = `${name}.${ext}`;
+    const blob = dataUrlToBlob(dataUrl);
+    return this.uploadImage({filename, mimeType}, {blob});
   }
 
   removeImage() {

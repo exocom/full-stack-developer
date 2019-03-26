@@ -129,18 +129,15 @@ export class PizzaModalComponent implements OnInit {
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processPhoto(photos) {
+  processPhoto(dataUrl) {
     this.loading.pizzaImage = true;
-    this.pizzaDataUrl = photos.both;
+    this.pizzaDataUrl = dataUrl;
 
     const name = this.pizzaFormGroup.value.name || randomString(8);
-    Object.keys(photos).forEach(key => {
-      const dataUrl = photos[key];
-      const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
-      const filename = `${key}-${name}.${ext}`;
-      const blob = dataUrlToBlob(dataUrl);
-      this.uploadImage({filename, mimeType}, {blob});
-    });
+    const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);
+    const filename = `${name}.${ext}`;
+    const blob = dataUrlToBlob(dataUrl);
+    return this.uploadImage({filename, mimeType}, {blob});
   }
 
   removeImage() {
