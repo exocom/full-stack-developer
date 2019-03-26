@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CameraService} from '../../services/camera.service';
-import {AudioService} from '../../services/audio.service';
 
 @Component({
   selector: 'app-camera-pad',
@@ -10,7 +9,7 @@ import {AudioService} from '../../services/audio.service';
 })
 export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
-  @ViewChild('cameraAudio') cameraAudio: ElementRef<HTMLAudioElement>;
+  @ViewChild('audioElement') audioElement: ElementRef<HTMLAudioElement>;
   @Output() photoCaptured = new EventEmitter<string>();
   isPortrait = true;
 
@@ -18,12 +17,7 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
   videoTrack: MediaStreamTrack;
   cameraPermissions$: Observable<PermissionStatus> = this.cameraService.getCameraPermissionStatus();
   hasCameraHardware: Readonly<boolean> = this.cameraService.hasCameraHardware;
-
-  private cameraAudioMap: {
-    audioElement: HTMLAudioElement;
-    audioContext: AudioContext;
-    track: MediaElementAudioSourceNode;
-  };
+  dataUrl: string;
 
   private orientationChange = () => {
     if (screen && screen.orientation && screen.orientation.type) {
@@ -59,7 +53,12 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   };
 
-  constructor(private audioService: AudioService, private cameraService: CameraService, private elementRef: ElementRef) {
+  private next = () => {
+    this.photoCaptured.next(this.dataUrl);
+    this.dataUrl = null;
+  };
+
+  constructor(private cameraService: CameraService, private elementRef: ElementRef) {
   }
 
   ngOnInit() {
@@ -78,22 +77,11 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.orientationChange();
       window.addEventListener('orientationchange', this.orientationChange, false);
       window.addEventListener('resize', this.orientationChange, false);
-
-      if (this.cameraAudioMap) {
-        const {audioContext} = this.cameraAudioMap;
-        if (audioContext.state === 'suspended') {
-          await audioContext.resume();
-        }
-      }
     });
   }
 
-  ngAfterViewInit(): void {
-    const audioElement = this.cameraAudio.nativeElement;
-    const audioContext = this.audioService.audioContext;
-    const track = audioContext.createMediaElementSource(audioElement);
-    track.connect(audioContext.destination);
-    this.cameraAudioMap = {audioContext, audioElement, track};
+  ngAfterViewInit() {
+    this.audioElement.nativeElement.addEventListener('ended', this.next);
   }
 
   ngOnDestroy(): void {
@@ -102,6 +90,9 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (this.videoTrack && this.videoTrack.stop) {
       this.videoTrack.stop();
+    }
+    if (this.audioElement && this.audioElement.nativeElement) {
+      this.audioElement.nativeElement.removeEventListener('ended', this.next);
     }
     window.removeEventListener('orientationchange', this.orientationChange);
     window.removeEventListener('resize', this.orientationChange);
@@ -114,17 +105,8 @@ export class CameraPadComponent implements OnInit, AfterViewInit, OnDestroy {
     canvas.width = width;
     canvas.height = height;
     context.drawImage(video, 0, 0, width, height);
-    const base64imageData = canvas.toDataURL('image/png');
+    this.dataUrl = canvas.toDataURL('image/png');
 
-    this.photoCaptured.next(base64imageData);
-
-    if (!this.cameraAudioMap) {
-      return;
-    }
-    const {audioElement, audioContext} = this.cameraAudioMap;
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
-    await audioElement.play();
+    await this.audioElement.nativeElement.play();
   }
 }

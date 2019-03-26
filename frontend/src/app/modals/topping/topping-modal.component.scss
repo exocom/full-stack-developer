@@ -13,5 +13,6 @@ ion-item-sliding ion-item {
 
   ion-img {
     width: 100%;
+    max-height: calc(100vw * 0.5625);
   }
 }
