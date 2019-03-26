@@ -11,7 +11,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deployDemo": "firebase deploy",
-    "deployTest": "ng build && firebase deploy --project ios-camera-to-canvas"
+    "deployTest": "firebase deploy --project ios-camera-to-canvas"
   },
   "private": true,
   "dependencies": {

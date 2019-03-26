@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content scrollY="false" scrollX="false">
+<ion-content>
   <form [formGroup]="pizzaFormGroup" flex-row>
     <div flex flex-grow [class.fix-loading-bottom]="!loading.pizzaImage">
       <ion-item-sliding *ngIf="urlFormControl?.value || tempImageData else noImage">

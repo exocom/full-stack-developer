@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content scrollY="false">
+<ion-content>
   <form [formGroup]="toppingFormGroup" flex-row>
     <div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
       <ion-item-sliding *ngIf="urlFormControl?.value || tempImageData else noImage">
