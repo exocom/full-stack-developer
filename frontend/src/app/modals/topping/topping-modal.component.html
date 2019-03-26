@@ -10,9 +10,9 @@
 <ion-content scrollY="false">
   <form [formGroup]="toppingFormGroup" flex-row>
     <div flex flex-grow [class.fix-loading-bottom]="!loading.toppingImage">
-      <ion-item-sliding *ngIf="urlFormControl.value || tempImageData else noImage">
+      <ion-item-sliding *ngIf="urlFormControl?.value || tempImageData else noImage">
         <ion-item lines="none" no-padding no-margin flex>
-          <ion-img [src]="urlFormControl.value || tempImageData"
+          <ion-img [src]="urlFormControl?.value || tempImageData"
                    [class.scanning]="loading.toppingValidation"></ion-img>
         </ion-item>
         <ion-item-options side="end">
@@ -23,8 +23,8 @@
       </ion-item-sliding>
 
       <ng-template #noImage>
-        <app-camera-pad *ngIf="true" (photoCaptured)="processDatUrl($event)"></app-camera-pad>
-        <app-file-upload-zone *ngIf="false" (files)="processFile($event)"></app-file-upload-zone>
+<!--        <app-camera-pad (photoCaptured)="processDataUrl($event)"></app-camera-pad>-->
+        <app-file-upload-zone (files)="processFile($event)"></app-file-upload-zone>
       </ng-template>
     </div>
     <ion-progress-bar *ngIf="loading.toppingImage" type="indeterminate" color="tertiary"></ion-progress-bar>

@@ -136,7 +136,7 @@ export class ToppingModalComponent implements OnInit {
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processDatUrl(dataUrl) {
+  processDataUrl(dataUrl) {
     this.loading.toppingImage = true;
     this.tempImageData = dataUrl;
 

@@ -2,7 +2,7 @@
 
   <video #video autoplay playsinline muted [class.hidden]="(cameraPermissions$ | async)?.state !== 'granted'"></video>
   <ion-fab *ngIf="(cameraPermissions$ | async)?.state === 'granted' else noPermissions" [vertical]="isPortrait ? 'bottom' : 'center'" [horizontal]="isPortrait ? 'center' : 'end'">
-    <ion-fab-button color="light" (click)="takePhoto($event)" size="small" >
+    <ion-fab-button color="light" (click)="takePhoto()" size="small" >
       <ion-icon size="large" name="aperture"></ion-icon>
     </ion-fab-button>
   </ion-fab>

@@ -30,11 +30,13 @@ export class AudioService {
     source.connect(this.audioContext.destination);
     source.start(0);
 
+    // NOTE this method could return an Observable. Using the eventListeners.
+    /*
     const ended = () => {
-      console.log('ALL DONE!');
       source.removeEventListener('ended', ended);
     };
 
     source.addEventListener('ended', ended);
+     */
   }
 }

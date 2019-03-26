@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material';
 import {ToastController} from '@ionic/angular';
+import {AudioService} from '../../services/audio.service';
 
 type CouponsCode = 'Konami Code' | 'Hadouken' | 'Persistence';
 
@@ -10,6 +11,8 @@ type CouponsCode = 'Konami Code' | 'Hadouken' | 'Persistence';
   styleUrls: ['./nes-controller-bottom-sheet.component.scss']
 })
 export class NesControllerBottomSheetComponent {
+  victoryAudioBuffer: Promise<AudioBuffer>;
+
   private konamiCode = NesControllerBottomSheetComponent.uninterrupted([
     'ArrowUp',
     'ArrowUp',
@@ -49,12 +52,14 @@ export class NesControllerBottomSheetComponent {
     {code: 'Persistence', generator: this.persistence}
   ];
 
-  constructor(private bottomSheetRef: MatBottomSheetRef<NesControllerBottomSheetComponent>,
+  constructor(private audioService: AudioService,
+              private bottomSheetRef: MatBottomSheetRef<NesControllerBottomSheetComponent>,
               private toastCtrl: ToastController) {
     this.konamiCode.next(0);
     this.hadoukenR.next(0);
     this.hadoukenL.next(0);
     this.persistence.next(0);
+    this.victoryAudioBuffer = this.audioService.getBuffer('/assets/audio/victory.mp3');
   }
 
 
@@ -93,6 +98,7 @@ export class NesControllerBottomSheetComponent {
       const result = generator.next(ev);
       if (result.done && result.value) {
         this.bottomSheetRef.dismiss();
+        this.audioService.playFromBuffer(await this.victoryAudioBuffer);
         await this.reward(code);
         break;
       }

@@ -1,41 +1,22 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
+/* tslint:disable:no-switch-case-fall-through */
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {Button} from 'selenium-webdriver';
 import {AudioService} from '../../services/audio.service';
 
 export type Button = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Start' | 'Select' | 'A' | 'B';
-
-type AudioHashMap = {
-  [T in Button]: {
-    audioElement: HTMLAudioElement;
-    audioContext: AudioContext;
-    track: MediaElementAudioSourceNode;
-  }
-};
 
 @Component({
   selector: 'app-nes-controller',
   templateUrl: './nes-controller.component.html',
   styleUrls: ['./nes-controller.component.scss']
 })
-export class NesControllerComponent implements AfterViewInit, OnDestroy {
+export class NesControllerComponent implements OnInit, OnDestroy {
   @Output() buttonPressed = new EventEmitter<Button>();
-  @ViewChild('upAudio') upAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('downAudio') downAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('leftAudio') leftAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('rightAudio') rightAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('startAudio') startAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('selectAudio') selectAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('aAudio') aAudio: ElementRef<HTMLAudioElement>;
-  @ViewChild('bAudio') bAudio: ElementRef<HTMLAudioElement>;
 
-  private audioMap: AudioHashMap = {
-    ArrowUp: null, ArrowDown: null, ArrowLeft: null, ArrowRight: null,
-    Start: null, Select: null,
-    A: null, B: null
-  };
+  clickAudioBuffer: Promise<AudioBuffer>;
+
   private keyDown = (event: KeyboardEvent) => {
     let {key} = event;
-    // noinspection FallThroughInSwitchStatementJS
     switch (key) {
       case 'a':
       case 'b':
@@ -56,62 +37,30 @@ export class NesControllerComponent implements AfterViewInit, OnDestroy {
   };
 
   constructor(private audioService: AudioService) {
-    window.addEventListener('keydown', this.keyDown);
   }
 
-  ngAfterViewInit(): void {
-    const audioElements: Array<{ key: Button, ref: ElementRef<HTMLAudioElement> }> = [
-      {key: 'ArrowUp', ref: this.upAudio},
-      {key: 'ArrowDown', ref: this.downAudio},
-      {key: 'ArrowLeft', ref: this.leftAudio},
-      {key: 'ArrowRight', ref: this.rightAudio},
-      {key: 'Start', ref: this.startAudio},
-      {key: 'Select', ref: this.selectAudio},
-      {key: 'A', ref: this.aAudio},
-      {key: 'B', ref: this.bAudio}
-    ];
-
-    this.audioMap = audioElements.reduce((obj, {key, ref}, i) => {
-      const audioElement = ref.nativeElement;
-      if (!audioElement) {
-        return;
-      }
-      const {audioContext} = this.audioService;
-      const track = audioContext.createMediaElementSource(audioElement);
-      track.connect(audioContext.destination);
-
-      obj[key] = {
-        audioElement,
-        audioContext,
-        track
-      };
-      return obj;
-    }, this.audioMap);
-
+  ngOnInit() {
+    window.addEventListener('keydown', this.keyDown);
+    this.clickAudioBuffer = this.audioService.getBuffer('/assets/audio/click.mp3');
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('keydown', this.keyDown);
   }
 
-  touchStart(button: Button, e: TouchEvent) {
+  touchStart(e: TouchEvent, button: Button) {
     e.stopPropagation();
     e.preventDefault();
-    this.pushButton(button);
+    return this.pushButton(button);
+  }
+
+  mouseDown(e: MouseEvent, button: Button) {
+    console.log('MOUSE DOWN');
+    return this.pushButton(button);
   }
 
   async pushButton(button: Button) {
-    if (!(button in this.audioMap)) {
-      return;
-    }
     this.buttonPressed.emit(button);
-    if (this.audioMap[button] === null) {
-      return;
-    }
-    const {audioElement, audioContext} = this.audioMap[button];
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
-    await audioElement.play();
+    await this.audioService.playFromBuffer(await this.clickAudioBuffer);
   }
 }

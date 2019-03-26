@@ -46,7 +46,7 @@ export class PizzaModalComponent implements OnInit {
 
   urlFormControl = this.imageFormGroup.get('url') as FormControl;
 
-  pizzaDataUrl: string | ArrayBuffer;
+  tempImageData: string | ArrayBuffer;
 
 
   constructor(private fb: FormBuilder,
@@ -122,16 +122,16 @@ export class PizzaModalComponent implements OnInit {
     this.loading.pizzaImage = true;
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      this.pizzaDataUrl = fileReader.result;
+      this.tempImageData = fileReader.result;
     };
     fileReader.readAsDataURL(file);
     const mimeType = getMIMEType(file.name);
     return this.uploadImage({filename: file.name, mimeType}, {file});
   }
 
-  processPhoto(dataUrl) {
+  processDataUrl(dataUrl) {
     this.loading.pizzaImage = true;
-    this.pizzaDataUrl = dataUrl;
+    this.tempImageData = dataUrl;
 
     const name = this.pizzaFormGroup.value.name || randomString(8);
     const [match, mimeType, ext] = dataUrl.match(dataUrlRegExp);

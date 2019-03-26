@@ -17,7 +17,7 @@ export class CameraPadComponent implements OnInit, OnDestroy {
   videoTrack: MediaStreamTrack;
   cameraPermissions$: Observable<PermissionStatus> = this.cameraService.getCameraPermissionStatus();
   hasCameraHardware: Readonly<boolean> = this.cameraService.hasCameraHardware;
-  shutterBuffer: AudioBuffer;
+  shutterAudioBuffer: Promise<AudioBuffer>;
 
   private orientationChange = () => {
     if (screen && screen.orientation && screen.orientation.type) {
@@ -56,7 +56,7 @@ export class CameraPadComponent implements OnInit, OnDestroy {
   constructor(private audioService: AudioService, private cameraService: CameraService, private elementRef: ElementRef) {
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.cameraPermissions$.subscribe(async permissionStatus => {
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {width: 1280, facingMode: 'environment'},
@@ -74,7 +74,7 @@ export class CameraPadComponent implements OnInit, OnDestroy {
       window.addEventListener('resize', this.orientationChange, false);
     });
 
-    this.shutterBuffer = await this.audioService.getBuffer('/assets/audio/camera-shutter-click.mp3');
+    this.shutterAudioBuffer = this.audioService.getBuffer('/assets/audio/camera-shutter-click.mp3');
   }
 
   ngOnDestroy(): void {
@@ -97,8 +97,8 @@ export class CameraPadComponent implements OnInit, OnDestroy {
     context.drawImage(this.video.nativeElement, 0, 0, width, height);
     const dataUrl = canvas.toDataURL('image/png');
 
-    if (this.shutterBuffer) {
-      this.audioService.playFromBuffer(this.shutterBuffer);
+    if (this.shutterAudioBuffer) {
+      this.audioService.playFromBuffer(await this.shutterAudioBuffer);
     }
     this.photoCaptured.next(dataUrl);
   }
