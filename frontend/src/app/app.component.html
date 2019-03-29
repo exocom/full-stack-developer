@@ -3,13 +3,13 @@
     <ion-content scrollY="false" scrollX="false">
       <div flex-row style="height: 100vh">
         <ion-list>
-          <ion-menu-toggle auto-hide="false">
+          <ion-menu-toggle>
             <ion-item routerLink="/toppings" routerLinkActive #rlaToppings="routerLinkActive">
               <ion-icon slot="start" src="/assets/harvest.svg"></ion-icon>
               <ion-label [color]="rlaToppings.isActive ? 'primary' : ''">Toppings</ion-label>
             </ion-item>
           </ion-menu-toggle>
-          <ion-menu-toggle auto-hide="false">
+          <ion-menu-toggle>
             <ion-item routerLink="/pizzas" routerLinkActive #rlaPizzas="routerLinkActive">
               <ion-icon slot="start" src="/assets/pizza.svg"></ion-icon>
               <ion-label [color]="rlaPizzas.isActive ? 'primary' : ''">Pizza Pies</ion-label>
