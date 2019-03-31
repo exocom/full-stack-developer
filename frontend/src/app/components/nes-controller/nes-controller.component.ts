@@ -61,6 +61,9 @@ export class NesControllerComponent implements OnInit, OnDestroy {
 
   async pushButton(button: Button) {
     this.buttonPressed.emit(button);
+    if (navigator.vibrate) {
+      navigator.vibrate([0, 50, 75]);
+    }
     await this.audioService.playFromBuffer(await this.clickAudioBuffer);
   }
 }
